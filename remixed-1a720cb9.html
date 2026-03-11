@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BuildAI — AI Website Builder</title>
+  <script>
+    tailwind = { config: { theme: { extend: {
+      fontFamily: { sans:['Inter','sans-serif'], display:['Bricolage Grotesque','sans-serif'], mono:['JetBrains Mono','monospace'] },
+      colors: { b0:'#000',b1:'#0a0a0a',b2:'#111',b3:'#161616',brd:'#1e1e1e',brd2:'#2a2a2a',
+                m:'#444',s:'#666',l:'#999',w:'#fff',
+                g:'#00ff88',bl:'#3b82f6',pu:'#a855f7' }
+    }}}};
+  </script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Bricolage+Grotesque:wght@600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%;background:#000;color:#fff;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased}
+    ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:#1e1e1e;border-radius:9px}
+
+    @keyframes spin  {to{transform:rotate(360deg)}}
+    @keyframes fade  {from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes throb {0%,100%{opacity:1;transform:scale(1)}50%{opacity:.25;transform:scale(.55)}}
+    @keyframes bob   {0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+    @keyframes scan  {0%{top:-10%}100%{top:110%}}
+    @keyframes bar   {from{background-position:200%}to{background-position:-200%}}
+    @keyframes cdpulse{0%,100%{opacity:1}50%{opacity:.5}}
+
+    .a-spin  {animation:spin 1s linear infinite}
+    .a-fade  {animation:fade .45s cubic-bezier(.16,1,.3,1) both}
+    .a-throb {animation:throb 2s ease-in-out infinite}
+    .a-bob   {animation:bob 3s ease-in-out infinite}
+
+    .ring{border:2px solid #1e1e1e;border-top-color:#00ff88;border-right-color:#3b82f6;border-radius:50%;animation:spin 1s linear infinite}
+    .bar-fill{transition:width .9s cubic-bezier(.4,0,.2,1)}
+
+    .grad{background:linear-gradient(90deg,#00ff88,#3b82f6,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .grad-ani{background:linear-gradient(90deg,#00ff88,#3b82f6,#a855f7,#00ff88);background-size:300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:bar 3s linear infinite}
+
+    .inp{background:#0a0a0a;border:1px solid #1e1e1e;color:#fff;font-family:'JetBrains Mono',monospace;font-size:11.5px;padding:10px 12px;border-radius:12px;outline:none;transition:border-color .2s;caret-color:#00ff88;width:100%}
+    .inp::placeholder{color:#2a2a2a}
+    .inp:focus{border-color:#2a2a2a}
+
+    .big-inp{background:#0d0d0d;border:1px solid #1e1e1e;color:#fff;font-family:'Inter',sans-serif;font-size:14px;padding:18px 56px 18px 18px;border-radius:14px;outline:none;transition:all .2s;caret-color:#00ff88;width:100%;resize:none;line-height:1.6;min-height:80px}
+    .big-inp::placeholder{color:#2a2a2a}
+    .big-inp:focus{border-color:#2a2a2a;box-shadow:0 0 0 1px #1e1e1e}
+
+    .send{position:absolute;right:12px;bottom:12px;width:36px;height:36px;background:#fff;border-radius:10px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
+    .send:hover{background:#e5e5e5;transform:scale(1.04)}
+    .send:disabled{background:#1a1a1a;cursor:not-allowed;transform:none}
+    .send:disabled svg{stroke:#333}
+
+    .chip{font-family:'Inter',sans-serif;font-size:11px;padding:5px 12px;border-radius:999px;border:1px solid #1e1e1e;color:#444;background:transparent;cursor:pointer;transition:all .14s;white-space:nowrap}
+    .chip:hover{border-color:#2a2a2a;color:#888}
+
+    .tab{font-family:'Inter',sans-serif;font-size:11px;font-weight:500;padding:5px 14px;border-radius:8px;border:none;cursor:pointer;transition:all .14s}
+    .ton{background:#1a1a1a;color:#fff}
+    .toff{background:transparent;color:#444}
+    .toff:hover{color:#888}
+
+    .dlb{display:flex;align-items:center;gap:6px;font-family:'Inter',sans-serif;font-size:12px;font-weight:500;padding:9px 14px;border-radius:10px;border:1px solid #1e1e1e;background:transparent;color:#555;cursor:pointer;transition:all .14s;width:100%;justify-content:center}
+    .dlb:hover:not(:disabled){border-color:#2a2a2a;color:#bbb}
+    .dlb:disabled{opacity:.2;cursor:not-allowed}
+
+    .hit{font-family:'JetBrains Mono',monospace;font-size:10px;padding:6px 10px;border-radius:8px;border:1px solid #1a1a1a;color:#333;cursor:pointer;transition:all .13s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .hit:hover{color:#666;border-color:#222}
+    .hit.on{color:#00ff88;border-color:rgba(0,255,136,.2);background:rgba(0,255,136,.03)}
+
+    .lbl{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#222}
+
+    /* model selector */
+    .mdl-sel{background:#0a0a0a;border:1px solid #1e1e1e;color:#555;font-family:'JetBrains Mono',monospace;font-size:10px;padding:8px 10px;border-radius:10px;outline:none;width:100%;cursor:pointer;transition:border-color .2s;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center}
+    .mdl-sel:hover{border-color:#2a2a2a;color:#888}
+    .mdl-sel option{background:#0d0d0d;color:#888}
+
+    /* cooldown bar */
+    .cd-wrap{display:none;flex-direction:column;gap:4px}
+    .cd-wrap.show{display:flex}
+    .cd-bar-bg{height:2px;background:#111;border-radius:99px;overflow:hidden}
+    .cd-bar-fg{height:100%;border-radius:99px;background:linear-gradient(90deg,#f59e0b,#ef4444);transition:width .5s linear}
+    .cd-txt{font-family:'JetBrains Mono',monospace;font-size:9px;color:#444;animation:cdpulse 1.5s ease-in-out infinite}
+
+    /* quality badge */
+    .qbadge{font-family:'JetBrains Mono',monospace;font-size:8px;padding:2px 6px;border-radius:99px;border:1px solid #1a1a1a;color:#333}
+    .qbadge.best{color:#00ff88;border-color:rgba(0,255,136,.2);background:rgba(0,255,136,.04)}
+    .qbadge.good{color:#3b82f6;border-color:rgba(59,130,246,.2);background:rgba(59,130,246,.04)}
+    .qbadge.fast{color:#a855f7;border-color:rgba(168,85,247,.2);background:rgba(168,85,247,.04)}
+
+    .gcard{background:#0d0d0d;border:1px solid #1a1a1a;border-radius:12px;overflow:hidden;cursor:pointer;transition:all .2s}
+    .gcard:hover{border-color:#2a2a2a;transform:translateY(-2px);box-shadow:0 12px 40px rgba(0,0,0,.6)}
+    .gthumb{width:100%;aspect-ratio:16/10;background:#111;position:relative;overflow:hidden}
+    .gthumb iframe{width:200%;height:200%;transform:scale(.5);transform-origin:top left;pointer-events:none;border:none}
+    .gover{position:absolute;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s}
+    .gcard:hover .gover{opacity:1}
+
+    .pbox{background:#080808;border:1px solid #1e1e1e;border-radius:20px;padding:44px 52px;min-width:340px;position:relative;overflow:hidden;box-shadow:0 48px 120px rgba(0,0,0,.9)}
+    .pscan{position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,255,136,.25),transparent);animation:scan 2.8s ease-in-out infinite}
+
+    .mback{background:rgba(0,0,0,.88);backdrop-filter:blur(14px)}
+
+    .mob-bar{height:64px;background:#0a0a0a;border-top:1px solid #1e1e1e;padding:0 14px;gap:8px;align-items:center;display:none;flex-shrink:0}
+    .mob-inp{flex:1;background:#111;border:1px solid #1e1e1e;border-radius:12px;padding:10px 14px;font-family:'Inter',sans-serif;font-size:13px;color:#fff;outline:none;caret-color:#00ff88}
+    .mob-inp::placeholder{color:#2a2a2a}
+    .mob-inp:focus{border-color:#2a2a2a}
+    .mob-ico-btn{width:40px;height:40px;border-radius:10px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .14s}
+
+    .msheet{position:fixed;inset:0;z-index:200;display:none}
+    .msback{position:absolute;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(10px)}
+    .mspanel{position:absolute;bottom:0;left:0;right:0;background:#0a0a0a;border-top:1px solid #1e1e1e;border-radius:20px 20px 0 0;max-height:88vh;overflow-y:auto;padding:16px 18px 48px;display:flex;flex-direction:column;gap:18px;transform:translateY(100%);transition:transform .35s cubic-bezier(.16,1,.3,1)}
+    .mspanel.open{transform:translateY(0)}
+    .mshandle{width:36px;height:3px;background:#1e1e1e;border-radius:99px;margin:0 auto 8px;flex-shrink:0}
+
+    .dcard{background:#111;border:1px solid #1a1a1a;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:9px}
+    .drow{display:flex;align-items:center;justify-content:space-between}
+    .dlbl{font-family:'JetBrains Mono',monospace;font-size:9px;color:#2a2a2a;text-transform:uppercase;letter-spacing:.08em}
+    .dval{font-family:'JetBrains Mono',monospace;font-size:10px;color:#666}
+    .dval.hi{color:#00ff88}
+
+    @media(max-width:768px){
+      .desk-side{display:none!important}
+      .mob-bar{display:flex!important}
+      .preview-wrap{height:calc(100vh - 52px - 64px)!important}
+    }
+  </style>
+</head>
+<body style="height:100vh;overflow:hidden">
+
+<!-- NAV -->
+<nav class="flex-shrink-0 flex items-center justify-between px-5 border-b border-brd bg-b1" style="height:52px">
+  <div class="flex items-center gap-2.5">
+    <div class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style="background:linear-gradient(135deg,#00ff88,#3b82f6)">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5">
+        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+      </svg>
+    </div>
+    <span class="font-display font-bold text-w" style="font-size:15px">BuildAI</span>
+  </div>
+  <div class="flex items-center gap-2">
+    <div class="flex items-center gap-1.5 border border-brd rounded-full px-2.5 py-1">
+      <span class="w-1.5 h-1.5 rounded-full bg-g a-throb"></span>
+      <span id="mdlBadge" class="font-mono text-s" style="font-size:9px">AI · free</span>
+    </div>
+    <div class="border border-brd rounded-full px-2.5 py-1 hidden sm:block">
+      <span id="devBadge" class="font-mono text-s" style="font-size:9px">detecting…</span>
+    </div>
+  </div>
+</nav>
+
+<!-- WORKSPACE -->
+<div class="flex" style="height:calc(100vh - 52px)">
+
+  <!-- SIDEBAR -->
+  <aside class="desk-side flex-shrink-0 flex flex-col border-r border-brd bg-b1 overflow-hidden" style="width:340px">
+    <div class="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
+
+      <!-- API Key -->
+      <div class="flex flex-col gap-1.5">
+        <div class="flex items-center justify-between">
+          <span class="lbl">OpenRouter Key</span>
+          <span class="font-mono rounded-full px-2 py-px border" style="font-size:8px;color:#00ff88;border-color:rgba(0,255,136,.2);background:rgba(0,255,136,.04)">FREE</span>
+        </div>
+        <div class="relative">
+          <input id="apiKey" type="password" class="inp" style="padding-right:36px" placeholder="sk-or-v1-…" autocomplete="off" spellcheck="false"/>
+          <button onclick="toggleEye('apiKey','eyeD')" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-m hover:text-s transition-colors" style="line-height:0">
+            <svg id="eyeD" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+            </svg>
+          </button>
+        </div>
+        <a href="https://openrouter.ai/keys" target="_blank" class="font-mono text-m hover:text-s transition-colors" style="font-size:9px">↗ Get free key · openrouter.ai/keys</a>
+      </div>
+
+      <!-- Model Selector -->
+      <div class="flex flex-col gap-1.5">
+        <div class="flex items-center justify-between">
+          <span class="lbl">AI Model</span>
+          <span id="qualityBadge" class="qbadge best">BEST</span>
+        </div>
+        <select id="modelSel" class="mdl-sel" onchange="onModelChange()"></select>
+        <p id="modelDesc" class="font-mono text-m" style="font-size:9px;line-height:1.5;color:#333"></p>
+      </div>
+
+      <div class="h-px bg-brd"></div>
+
+      <!-- Prompt -->
+      <div class="flex flex-col gap-1.5">
+        <span class="lbl">Describe your website</span>
+        <div class="relative">
+          <textarea id="prompt" class="big-inp" rows="5"
+            placeholder="e.g. A dark SaaS landing page for an AI writing tool called 'Quill' — sticky nav, hero with animated gradient, 6 feature cards, pricing section, testimonials, footer. Use violet + cyan accent."></textarea>
+          <button id="sendBtn" class="send" onclick="generate()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/>
+            </svg>
+          </button>
+        </div>
+        <p class="font-mono text-m" style="font-size:9px">⌘ + Enter · More detail = better site</p>
+      </div>
+
+      <!-- Cooldown indicator -->
+      <div id="cdWrap" class="cd-wrap">
+        <div class="cd-bar-bg"><div id="cdBar" class="cd-bar-fg" style="width:100%"></div></div>
+        <p id="cdTxt" class="cd-txt">⏳ Cooldown: 30s remaining…</p>
+      </div>
+
+      <!-- Templates -->
+      <div class="flex flex-col gap-1.5">
+        <span class="lbl">Quick templates</span>
+        <div id="chips" class="flex flex-wrap gap-1.5"></div>
+      </div>
+
+      <p id="statusD" class="font-mono text-m" style="font-size:10px;min-height:1rem;transition:color .2s"></p>
+
+      <!-- Download -->
+      <button id="dlBtn" class="dlb" onclick="dlFile()" disabled>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Download HTML
+      </button>
+
+      <div class="h-px bg-brd"></div>
+
+      <!-- History -->
+      <div class="flex flex-col gap-1.5">
+        <span class="lbl">History</span>
+        <div id="histD" class="flex flex-col gap-1"></div>
+        <p id="histEmptyD" class="font-mono text-m" style="font-size:9px">No generations yet.</p>
+      </div>
+    </div>
+  </aside>
+
+  <!-- PREVIEW PANE -->
+  <div class="flex-1 flex flex-col overflow-hidden bg-b0 preview-wrap" style="height:calc(100vh - 52px)">
+    <div class="flex-shrink-0 flex items-center justify-between px-4 border-b border-brd bg-b1" style="height:42px">
+      <div class="flex gap-1.5">
+        <div class="w-3 h-3 rounded-full" style="background:#ff5f57"></div>
+        <div class="w-3 h-3 rounded-full" style="background:#febc2e"></div>
+        <div class="w-3 h-3 rounded-full" style="background:#28c840"></div>
+      </div>
+      <div id="urlBar" class="font-mono text-s border border-brd bg-b1 rounded-lg px-3 py-1 truncate hidden sm:block" style="font-size:9.5px;max-width:320px">buildai://new-website</div>
+      <div class="flex gap-0.5">
+        <button id="tP" class="tab ton" onclick="switchTab('preview')">Preview</button>
+        <button id="tG" class="tab toff" onclick="switchTab('gallery')">Gallery</button>
+        <button id="tC" class="tab toff" onclick="switchTab('code')">Code</button>
+      </div>
+    </div>
+
+    <div class="flex-1 relative overflow-hidden">
+      <!-- empty state -->
+      <div id="emptyEl" class="absolute inset-0 flex flex-col items-center justify-center gap-5 pointer-events-none select-none">
+        <div class="w-20 h-20 rounded-3xl flex items-center justify-center a-bob" style="background:linear-gradient(135deg,rgba(0,255,136,.07),rgba(59,130,246,.07));border:1px solid #1a1a1a">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
+            <path d="M12 2L2 7l10 5 10-5-10-5z" stroke="#00ff88" stroke-width="1.5" stroke-linejoin="round"/>
+            <path d="M2 17l10 5 10-5" stroke="#3b82f6" stroke-width="1.5" stroke-linejoin="round"/>
+            <path d="M2 12l10 5 10-5" stroke="#1e1e1e" stroke-width="1.5" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="text-center">
+          <p class="font-display font-bold" style="font-size:15px;color:#1a1a1a">Your website will appear here</p>
+          <p class="font-mono text-m text-center leading-relaxed mt-2" style="font-size:10px;max-width:220px">Describe what you want → hit <span class="text-g">Generate</span></p>
+        </div>
+      </div>
+
+      <iframe id="frame" class="hidden w-full h-full border-none" style="background:#fff"></iframe>
+
+      <div id="galleryEl" class="hidden absolute inset-0 overflow-auto p-4">
+        <div class="flex items-center justify-between mb-4">
+          <p class="font-display font-bold text-w" style="font-size:15px">Gallery <span id="gCount" class="font-mono text-m" style="font-size:10px;font-weight:400">0 sites</span></p>
+          <p class="font-mono text-m" style="font-size:9px">Click to preview</p>
+        </div>
+        <div id="gGrid" class="grid gap-3" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr))"></div>
+        <div id="gEmpty" class="flex items-center justify-center py-16">
+          <p class="font-mono text-m" style="font-size:10px">Generate a website to see it here.</p>
+        </div>
+      </div>
+
+      <div id="codeEl" class="hidden absolute inset-0 overflow-auto bg-b0 p-5">
+        <pre id="codePre" class="font-mono leading-relaxed whitespace-pre-wrap break-all" style="font-size:11px;color:#444"></pre>
+      </div>
+
+      <!-- PROGRESS OVERLAY -->
+      <div id="progEl" class="hidden absolute inset-0 flex items-center justify-center mback" style="z-index:50">
+        <div class="pbox a-fade flex flex-col items-center gap-5">
+          <div class="pscan"></div>
+          <div class="relative flex items-center justify-center" style="width:72px;height:72px">
+            <div class="ring absolute inset-0" style="border-width:2.5px"></div>
+            <div class="absolute inset-0 rounded-full" style="border:1px solid rgba(0,255,136,.06)"></div>
+            <span id="pEmoji" class="a-bob" style="font-size:2rem;line-height:1">🧠</span>
+          </div>
+          <div class="text-center flex flex-col gap-1">
+            <p id="pLbl" class="font-display font-bold grad-ani" style="font-size:16px">Understanding your prompt…</p>
+            <p id="pSub" class="font-mono text-m" style="font-size:9.5px">Usually takes 15–30 seconds</p>
+          </div>
+          <div class="w-full rounded-full overflow-hidden" style="height:2px;background:#1a1a1a">
+            <div id="pBar" class="bar-fill h-full rounded-full" style="width:2%;background:linear-gradient(90deg,#00ff88,#3b82f6)"></div>
+          </div>
+          <div id="pSteps" class="flex flex-col gap-2.5 w-full"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MOBILE BOTTOM BAR -->
+<div class="mob-bar fixed bottom-0 left-0 right-0" style="z-index:90">
+  <button class="mob-ico-btn" style="background:#111;border:1px solid #1e1e1e;color:#555" onclick="openSheet()">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+    </svg>
+  </button>
+  <input id="mobP" class="mob-inp" placeholder="Describe your website…"/>
+  <button id="mobSend" class="mob-ico-btn send" style="position:static;width:40px;height:40px" onclick="generateMobile()">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round">
+      <line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/>
+    </svg>
+  </button>
+</div>
+
+<!-- MOBILE SHEET -->
+<div id="mSheet" class="msheet">
+  <div class="msback" onclick="closeSheet()"></div>
+  <div id="msPanel" class="mspanel">
+    <div class="mshandle"></div>
+    <div class="dcard">
+      <div class="flex items-center justify-between">
+        <p class="font-mono text-s" style="font-size:10px;font-weight:600">📱 Your Device</p>
+        <span id="devBadgeMob" class="font-mono" style="font-size:9px;color:#444">detecting…</span>
+      </div>
+      <div class="drow"><span class="dlbl">OS</span><span class="dval hi" id="dOS">—</span></div>
+      <div class="drow"><span class="dlbl">Type</span><span class="dval" id="dType">—</span></div>
+      <div class="drow"><span class="dlbl">Browser</span><span class="dval" id="dBr">—</span></div>
+      <div class="drow"><span class="dlbl">Screen</span><span class="dval" id="dScr">—</span></div>
+      <div class="drow"><span class="dlbl">Display</span><span class="dval" id="dDis">—</span></div>
+      <div class="drow"><span class="dlbl">Network</span><span class="dval" id="dNet">—</span></div>
+    </div>
+
+    <!-- API Key mobile -->
+    <div class="flex flex-col gap-1.5">
+      <div class="flex items-center justify-between">
+        <span class="lbl">OpenRouter Key</span>
+        <span class="font-mono rounded-full px-2 py-px border" style="font-size:8px;color:#00ff88;border-color:rgba(0,255,136,.2)">FREE</span>
+      </div>
+      <div class="relative">
+        <input id="mobKey" type="password" class="inp" style="padding-right:36px" placeholder="sk-or-v1-…" autocomplete="off"/>
+        <button onclick="toggleEye('mobKey','eyeM')" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-m hover:text-s" style="line-height:0">
+          <svg id="eyeM" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+          </svg>
+        </button>
+      </div>
+      <a href="https://openrouter.ai/keys" target="_blank" class="font-mono text-m" style="font-size:9px">↗ openrouter.ai/keys — free</a>
+    </div>
+
+    <!-- Model selector mobile -->
+    <div class="flex flex-col gap-1.5">
+      <span class="lbl">AI Model</span>
+      <select id="modelSelMob" class="mdl-sel" onchange="onModelChangeMob()"></select>
+    </div>
+
+    <!-- Templates mobile -->
+    <div class="flex flex-col gap-1.5">
+      <span class="lbl">Templates</span>
+      <div id="mobChips" class="flex flex-wrap gap-1.5"></div>
+    </div>
+
+    <!-- Cooldown mobile -->
+    <div id="cdWrapMob" class="cd-wrap">
+      <div class="cd-bar-bg"><div id="cdBarMob" class="cd-bar-fg" style="width:100%"></div></div>
+      <p id="cdTxtMob" class="cd-txt">⏳ Cooldown: 30s remaining…</p>
+    </div>
+
+    <p id="statusM" class="font-mono text-m" style="font-size:10px;min-height:1rem"></p>
+
+    <button id="mobDl" class="dlb" onclick="dlFile()" disabled>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+      </svg>
+      Download HTML
+    </button>
+
+    <div class="flex flex-col gap-1.5">
+      <span class="lbl">History</span>
+      <div id="histM" class="flex flex-col gap-1"></div>
+      <p id="histEmptyM" class="font-mono text-m" style="font-size:9px">No generations yet.</p>
+    </div>
+  </div>
+</div>
+
+<!-- PREVIEW MODAL -->
+<div id="modal" class="hidden fixed inset-0 mback flex items-center justify-center" style="z-index:100">
+  <div class="flex flex-col rounded-2xl border border-brd overflow-hidden" style="width:92vw;height:90vh;background:#080808">
+    <div class="flex items-center justify-between px-4 border-b border-brd flex-shrink-0" style="height:44px">
+      <p id="mTitle" class="font-mono text-s truncate" style="font-size:10px;max-width:60%">preview</p>
+      <div class="flex items-center gap-2">
+        <button onclick="dlModal()" class="dlb" style="width:auto;padding:5px 10px;font-size:10px">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>Download
+        </button>
+        <button onclick="closeModal()" style="background:none;border:none;color:#444;font-size:18px;cursor:pointer;line-height:1;padding:4px">✕</button>
+      </div>
+    </div>
+    <iframe id="mFrame" class="flex-1 border-none" style="background:#fff"></iframe>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════
+   MODEL REGISTRY — Curated best free models (Mar 2026)
+   Priority order: best quality first, fallback to faster/lighter
+══════════════════════════════════════ */
+const MODELS = [
+  {
+    id:    'deepseek/deepseek-chat-v3-0324:free',
+    name:  'DeepSeek V3 0324',
+    desc:  'Top-tier free model. Best overall quality for HTML/CSS generation. 164K context.',
+    tier:  'best',
+  },
+  {
+    id:    'meta-llama/llama-4-maverick:free',
+    name:  'Llama 4 Maverick',
+    desc:  'Meta flagship MoE model. Exceptional at creative layouts + code. 1M context.',
+    tier:  'best',
+  },
+  {
+    id:    'qwen/qwen3-235b-a22b:free',
+    name:  'Qwen3 235B A22B',
+    desc:  'Alibaba giant MoE — strongest at complex multi-section pages. 131K context.',
+    tier:  'best',
+  },
+  {
+    id:    'google/gemini-2.5-pro-exp-03-25:free',
+    name:  'Gemini 2.5 Pro Exp',
+    desc:  'Google\'s smartest free model. Great reasoning + design sense. 1M context.',
+    tier:  'best',
+  },
+  {
+    id:    'meta-llama/llama-4-scout:free',
+    name:  'Llama 4 Scout',
+    desc:  'Lighter Llama 4 variant. Fast & reliable. Good for simpler pages. 512K context.',
+    tier:  'good',
+  },
+  {
+    id:    'mistralai/mistral-small-3.1-24b-instruct:free',
+    name:  'Mistral Small 3.1',
+    desc:  'Solid European model. Consistent HTML output. 128K context.',
+    tier:  'good',
+  },
+  {
+    id:    'meta-llama/llama-3.3-70b-instruct:free',
+    name:  'Llama 3.3 70B',
+    desc:  'Battle-tested workhorse. Very reliable fallback. 131K context.',
+    tier:  'good',
+  },
+  {
+    id:    'openrouter/free',
+    name:  'Auto-Router (Any Free)',
+    desc:  'OpenRouter picks the best available model automatically. Good as last resort.',
+    tier:  'fast',
+  },
+];
+
+const API  = 'https://openrouter.ai/api/v1/chat/completions';
+const DKEY = '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';
+const CD   = 30; // cooldown seconds
+
+const TMPLS = [
+  'SaaS landing','Portfolio','Restaurant','Startup pitch',
+  'Blog home','Agency','App landing','E-commerce','Personal CV','NFT project'
+];
+
+const STEPS = [
+  { e:'🧠', t:'Understanding your prompt…',   s:'Analyzing content & intent'          },
+  { e:'🏗️',  t:'Planning sections…',          s:'Nav · Hero · Features · CTA · Footer'},
+  { e:'🎨', t:'Designing visual style…',      s:'Colors, fonts & spacing system'      },
+  { e:'💻', t:'Writing HTML…',               s:'Semantic structure & layout'          },
+  { e:'✨', t:'Styling with CSS…',           s:'Animations, gradients & responsive'   },
+  { e:'⚡', t:'Adding interactions…',         s:'Scroll effects & hover states'        },
+  { e:'🚀', t:'Finalizing…',                 s:'Cleaning & packaging output'          },
+];
+
+const SYS = `You are BuildAI. Generate a complete, single-file HTML website based EXACTLY on what the user describes.
+
+ABSOLUTE OUTPUT RULES — NEVER BREAK:
+- Output ONLY the raw HTML. First character must be < from <!DOCTYPE html>
+- NO text before or after HTML. NO markdown. NO code fences. NO explanations.
+- All CSS inside one <style> tag in <head>. All JS inside one <script> tag before </body>.
+- Only allowed external resource: Google Fonts via @import in CSS
+
+READ THE PROMPT CAREFULLY AND FOLLOW IT:
+- Use the EXACT brand/product name the user gave
+- Include every section and feature they mentioned
+- Match their described tone, industry, style
+- Use any colors they specified; if not, pick a palette that perfectly fits the industry
+- Write ALL copy specifically for THEIR brand — names, taglines, features, CTAs
+
+REQUIRED SECTIONS — include ALL:
+1. NAVIGATION — sticky, blur backdrop, logo + 4 links + CTA button, working mobile hamburger
+2. HERO — 100vh, clamp(3rem,6vw,7rem) headline weight 800, subtext, 2 buttons, animated background, fade-up entrance
+3. FEATURES — 3-6 cards grid, icon box + bold title + description, hover glow lift
+4. SOCIAL PROOF — 3 testimonial cards OR stats row
+5. PRICING or CTA — 3 tiers or full-width gradient CTA
+6. FOOTER — dark, 3-4 columns, SVG social icons, copyright
+
+TECHNICAL:
+- Google Fonts: 1 display + 1 body font — NEVER system fonts
+- CSS variables: --primary, --accent, --bg, --surface, --text, --muted
+- IntersectionObserver fade-up on ALL sections
+- CSS Grid + Flexbox only
+- All hovers: 200ms transitions, translateY(-2px) + glow
+- Mobile responsive with hamburger <768px
+
+COPY: Zero Lorem Ipsum. Every word specific to the brand.
+
+PRELOADER — MANDATORY:
+Add right after <body>:
+<div class="preloader" id="preloader"><span></span><span></span><span></span><span></span><span></span></div>
+CSS: .preloader{position:fixed;top:0;left:0;width:100%;height:100%;background:var(--bg,#000);display:flex;align-items:center;justify-content:center;gap:7px;z-index:9999;transition:opacity .5s ease,visibility .5s ease} .preloader.hidden{opacity:0;visibility:hidden} .preloader span{display:block;width:15px;height:15px;border-radius:10px;background:var(--primary,#19e3d5);margin:0 7px;animation:preloaderBounce 1.2s infinite} .preloader span:nth-child(1){animation-delay:.15s} .preloader span:nth-child(2){animation-delay:.3s} .preloader span:nth-child(3){animation-delay:.45s} .preloader span:nth-child(4){animation-delay:.6s} .preloader span:nth-child(5){animation-delay:.75s} @keyframes preloaderBounce{0%{height:15px}50%{height:60px;background:var(--accent,#d33deb)}100%{height:15px}}
+JS: window.addEventListener('load',()=>{setTimeout(()=>{document.getElementById('preloader').classList.add('hidden');},300);});
+
+Output the complete HTML file. Start with <!DOCTYPE html>. Nothing else.`;
+
+/* ══ STATE ══ */
+let curHTML   = '';
+let gallery   = [];
+let hist      = [];
+let curTab    = 'preview';
+let modalHTML = '';
+const timers  = [];
+
+// Cooldown state
+let cdActive  = false;
+let cdTimer   = null;
+let cdInterval= null;
+let cdRemain  = 0;
+
+/* ══ INIT ══ */
+document.getElementById('apiKey').value = DKEY;
+buildModelSelectors();
+buildChips();
+document.getElementById('prompt').addEventListener('keydown', e => {
+  if ((e.metaKey||e.ctrlKey) && e.key==='Enter') generate();
+});
+detectDevice();
+
+/* ══ MODEL SELECTORS ══ */
+function buildModelSelectors() {
+  ['modelSel','modelSelMob'].forEach(id => {
+    const sel = document.getElementById(id); if (!sel) return;
+    MODELS.forEach((m,i) => {
+      const opt = document.createElement('option');
+      opt.value = m.id;
+      opt.textContent = m.name + (m.tier==='best'?' ★':'');
+      sel.appendChild(opt);
+    });
+  });
+  updateModelMeta();
+}
+
+function onModelChange() {
+  const id = document.getElementById('modelSel').value;
+  document.getElementById('modelSelMob').value = id;
+  updateModelMeta();
+}
+function onModelChangeMob() {
+  const id = document.getElementById('modelSelMob').value;
+  document.getElementById('modelSel').value = id;
+  updateModelMeta();
+}
+
+function updateModelMeta() {
+  const id = document.getElementById('modelSel').value;
+  const m  = MODELS.find(x=>x.id===id) || MODELS[0];
+  const bd = document.getElementById('qualityBadge');
+  const de = document.getElementById('modelDesc');
+  if (bd) { bd.className='qbadge '+m.tier; bd.textContent=m.tier.toUpperCase(); }
+  if (de) { de.textContent=m.desc; }
+  document.getElementById('mdlBadge').textContent = m.name.split(' ').slice(0,2).join(' ') + ' · free';
+}
+
+function getSelectedModel() {
+  return document.getElementById('modelSel').value || MODELS[0].id;
+}
+
+/* ══ CHIPS ══ */
+function buildChips() {
+  ['chips','mobChips'].forEach(id => {
+    const w = document.getElementById(id); if (!w) return;
+    TMPLS.forEach(t => {
+      const b = document.createElement('button');
+      b.className = 'chip';
+      b.textContent = t;
+      b.onclick = () => {
+        document.getElementById('prompt').value = t;
+        document.getElementById('mobP').value   = t;
+        if (id==='mobChips') closeSheet();
+        document.getElementById('prompt').focus?.();
+      };
+      w.appendChild(b);
+    });
+  });
+}
+
+/* ══ COOLDOWN ══ */
+function startCooldown() {
+  cdActive  = true;
+  cdRemain  = CD;
+  setGenBtnsDisabled(true);
+  showCD(true);
+
+  clearInterval(cdInterval);
+  cdInterval = setInterval(() => {
+    cdRemain--;
+    updateCDUI(cdRemain);
+    if (cdRemain <= 0) endCooldown();
+  }, 1000);
+}
+
+function endCooldown() {
+  clearInterval(cdInterval);
+  cdActive = false;
+  setGenBtnsDisabled(false);
+  showCD(false);
+}
+
+function showCD(v) {
+  ['cdWrap','cdWrapMob'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.classList.toggle('show', v);
+  });
+}
+
+function updateCDUI(s) {
+  const pct = (s / CD) * 100;
+  const txt = `⏳ Cooldown: ${s}s remaining — prevents rate limiting`;
+  ['cdBar','cdBarMob'].forEach(id => {
+    const el=document.getElementById(id); if(el) el.style.width=pct+'%';
+  });
+  ['cdTxt','cdTxtMob'].forEach(id => {
+    const el=document.getElementById(id); if(el) el.textContent=txt;
+  });
+}
+
+function setGenBtnsDisabled(v) {
+  document.getElementById('sendBtn').disabled = v;
+  document.getElementById('mobSend').disabled = v;
+}
+
+/* ══ EYE TOGGLE ══ */
+function toggleEye(inputId, iconId) {
+  const inp  = document.getElementById(inputId);
+  const ico  = document.getElementById(iconId);
+  const show = inp.type==='password';
+  inp.type   = show ? 'text' : 'password';
+  ico.innerHTML = show
+    ? `<path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/>
+       <path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/>
+       <line x1="1" y1="1" x2="23" y2="23"/>`
+    : `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`;
+}
+
+/* ══ TABS ══ */
+function switchTab(t) {
+  curTab = t;
+  ['P','G','C'].forEach(id => {
+    document.getElementById('t'+id).className = 'tab ' +
+      ((id==='P'&&t==='preview')||(id==='G'&&t==='gallery')||(id==='C'&&t==='code') ? 'ton':'toff');
+  });
+  document.getElementById('frame').classList.toggle('hidden',    !(t==='preview'&&curHTML));
+  document.getElementById('galleryEl').classList.toggle('hidden', t!=='gallery');
+  document.getElementById('codeEl').classList.toggle('hidden',    t!=='code');
+  if (t==='gallery') renderGallery();
+}
+
+/* ══ PROGRESS ══ */
+function showProg() {
+  const el   = document.getElementById('progEl');
+  const list = document.getElementById('pSteps');
+  el.classList.remove('hidden');
+  list.innerHTML = STEPS.map((s,i) =>
+    `<div id="row${i}" class="flex items-start gap-3" style="animation:fade .3s ease ${i*45}ms both">
+      <span id="dot${i}" style="width:5px;height:5px;border-radius:50%;background:#1a1a1a;margin-top:4px;flex-shrink:0;transition:all .3s"></span>
+      <div>
+        <p id="rt${i}" class="font-mono" style="font-size:10.5px;color:#1e1e1e;transition:color .3s">${s.t}</p>
+        <p id="rs${i}" class="font-mono" style="font-size:9px;color:#161616;transition:color .3s;margin-top:1px">${s.s}</p>
+      </div>
+    </div>`
+  ).join('');
+  setStep(0);
+  [0,2200,4800,7600,11000,15000,19500].forEach((d,i) => {
+    timers.push(setTimeout(() => { if (!el.classList.contains('hidden')) setStep(i); }, d));
+  });
+}
+
+function setStep(i) {
+  document.getElementById('pBar').style.width   = Math.max(2,Math.round((i/(STEPS.length-1))*85))+'%';
+  document.getElementById('pLbl').textContent   = STEPS[i].t;
+  document.getElementById('pEmoji').textContent = STEPS[i].e;
+  document.getElementById('pSub').textContent   = STEPS[i].s;
+  STEPS.forEach((_,j) => {
+    const dot=document.getElementById('dot'+j), rt=document.getElementById('rt'+j), rs=document.getElementById('rs'+j);
+    if (!dot) return;
+    if      (j<i) { dot.style.background='#00ff88'; if(rt) rt.style.color='#00ff88'; if(rs) rs.style.color='#2a2a2a'; }
+    else if (j===i){ dot.style.background='#3b82f6'; if(rt) rt.style.color='#fff';    if(rs) rs.style.color='#555'; }
+    else           { dot.style.background='#1a1a1a'; if(rt) rt.style.color='#1e1e1e'; if(rs) rs.style.color='#161616'; }
+  });
+}
+
+function hideProg(ok) {
+  timers.forEach(clearTimeout); timers.length=0;
+  const el = document.getElementById('progEl');
+  if (ok) {
+    document.getElementById('pBar').style.width   = '100%';
+    document.getElementById('pLbl').textContent   = 'Website ready!';
+    document.getElementById('pEmoji').textContent = '🎉';
+    document.getElementById('pSub').textContent   = 'Rendering preview…';
+    STEPS.forEach((_,j) => {
+      const d=document.getElementById('dot'+j), r=document.getElementById('rt'+j);
+      if(d) d.style.background='#00ff88'; if(r) r.style.color='#00ff88';
+    });
+    setTimeout(()=>el.classList.add('hidden'),900);
+  } else { el.classList.add('hidden'); }
+}
+
+/* ══ GENERATE ══ */
+async function generate() {
+  if (cdActive) {
+    setStatus(`⏳ Wait ${cdRemain}s before generating again.`, 'warn'); return;
+  }
+  const p   = document.getElementById('prompt').value.trim();
+  const key = (document.getElementById('apiKey').value || document.getElementById('mobKey').value || '').trim();
+  if (!p)   { setStatus('⚠ Describe your website first.', 'warn'); return; }
+  if (!key) { setStatus('⚠ Enter your OpenRouter API key.', 'warn'); return; }
+
+  const model     = getSelectedModel();
+  const modelInfo = MODELS.find(m=>m.id===model) || MODELS[0];
+
+  setGenBtnsDisabled(true);
+  showProg();
+  setStatus('Connecting · ' + modelInfo.name + '…', '');
+
+  try {
+    const res = await fetch(API, {
+      method: 'POST',
+      headers: {
+        'Content-Type':  'application/json',
+        'Authorization': 'Bearer ' + key,
+        'HTTP-Referer':  'https://buildai.app',
+        'X-Title':       'BuildAI',
+      },
+      body: JSON.stringify({
+        model,
+        max_tokens:  8192,
+        temperature: 0.85,
+        messages: [
+          { role:'system', content:SYS },
+          { role:'user',   content:'Build a stunning, complete website for:\n\n'+p+'\n\nFollow all system prompt instructions exactly. Output ONLY the complete HTML file.' }
+        ]
+      })
+    });
+
+    if (!res.ok) {
+      let msg='';
+      try { const b=await res.json(); msg=b?.error?.message||''; } catch(_){}
+      if (/401|unauthorized|invalid.*key/i.test(msg||res.status)) {
+        throw new Error('INVALID_KEY');
+      }
+      if (res.status===429) throw new Error('RATE_LIMIT');
+      throw new Error('HTTP '+res.status+(msg?' — '+msg:''));
+    }
+
+    const data = await res.json();
+    let text = (data?.choices?.[0]?.message?.content||'').trim();
+    text = text.replace(/^```html\s*/im,'').replace(/^```\s*/im,'').replace(/```\s*$/m,'').trim();
+    if (!text.match(/<!doctype|<html/i)) {
+      const m2 = text.match(/<!DOCTYPE[\s\S]*<\/html>/i)||text.match(/<html[\s\S]*<\/html>/i);
+      if (m2) text=m2[0]; else throw new Error('non-HTML response from model');
+    }
+
+    // Success
+    const usedModel = data?.model || model;
+    const badge = usedModel.split('/').pop().replace(':free','');
+    document.getElementById('mdlBadge').textContent = badge+' · free';
+
+    curHTML = injectPreloader(text);
+    hideProg(true);
+    renderPreview(curHTML);
+    pushGallery(p, curHTML);
+    pushHist(p, curHTML);
+    document.getElementById('dlBtn').disabled = false;
+    document.getElementById('mobDl').disabled = false;
+    document.getElementById('urlBar').textContent = slug(p)+'.html';
+    setStatus('✓ Website generated with '+badge+'!', 'ok');
+
+    // Start cooldown AFTER success
+    startCooldown();
+
+  } catch(err) {
+    hideProg(false);
+    setGenBtnsDisabled(false);
+    const msg = err.message||'';
+    if (msg==='INVALID_KEY')  setStatus('✕ Invalid API key — check your OpenRouter key.', 'err');
+    else if (msg==='RATE_LIMIT') { setStatus('✕ Rate limit hit — try another model or wait a moment.', 'err'); startCooldown(); }
+    else setStatus('✕ '+msg, 'err');
+  }
+}
+
+/* ══ MOBILE GENERATE ══ */
+function generateMobile() {
+  const p=document.getElementById('mobP').value.trim();
+  const k=document.getElementById('mobKey').value.trim();
+  if (p) document.getElementById('prompt').value=p;
+  if (k) document.getElementById('apiKey').value=k;
+  closeSheet();
+  generate();
+}
+
+/* ══ PRELOADER INJECT ══ */
+function injectPreloader(h) {
+  if (/preloader/i.test(h)) return h;
+  const css=`.preloader{position:fixed;top:0;left:0;width:100%;height:100%;background:var(--bg,#000);display:flex;align-items:center;justify-content:center;gap:0;z-index:9999;transition:opacity .5s ease,visibility .5s ease}.preloader.hidden{opacity:0;visibility:hidden;pointer-events:none}.preloader span{display:block;height:15px;width:15px;background:#19e3d5;margin:0 7px;border-radius:10px;animation:preUp 1.2s infinite}.preloader span:nth-child(1){animation-delay:.15s}.preloader span:nth-child(2){animation-delay:.3s}.preloader span:nth-child(3){animation-delay:.45s}.preloader span:nth-child(4){animation-delay:.6s}.preloader span:nth-child(5){animation-delay:.75s}@keyframes preUp{0%{height:15px;background:#19e3d5}50%{height:60px;background:#d33deb}100%{height:15px;background:#f00e43}}`;
+  const html=`<div class="preloader" id="buildai-preloader"><span></span><span></span><span></span><span></span><span></span></div>`;
+  const js  =`<script>window.addEventListener('load',function(){setTimeout(function(){var p=document.getElementById('buildai-preloader');if(p)p.classList.add('hidden');},300);});<\/script>`;
+  if (h.includes('</style>')) h=h.replace('</style>',css+'</style>');
+  else if (h.includes('</head>')) h=h.replace('</head>','<style>'+css+'</style></head>');
+  h=h.replace(/<body([^>]*)>/i,'<body$1>'+html);
+  h=h.replace('</body>',js+'</body>');
+  return h;
+}
+
+/* ══ RENDER ══ */
+function renderPreview(h) {
+  document.getElementById('emptyEl').style.display='none';
+  const f=document.getElementById('frame');
+  f.srcdoc=h;
+  f.classList.toggle('hidden', curTab!=='preview');
+  document.getElementById('codePre').textContent=h;
+  document.getElementById('codeEl').classList.toggle('hidden', curTab!=='code');
+}
+
+/* ══ GALLERY ══ */
+function pushGallery(p,h) {
+  gallery.unshift({p,h,ts:Date.now()});
+  if (gallery.length>20) gallery.pop();
+  document.getElementById('gCount').textContent=gallery.length+' site'+(gallery.length!==1?'s':'');
+  if (curTab==='gallery') renderGallery();
+}
+function renderGallery() {
+  const grid=document.getElementById('gGrid'), empty=document.getElementById('gEmpty');
+  empty.style.display=gallery.length?'none':'flex';
+  grid.innerHTML='';
+  gallery.forEach((item,i)=>{
+    const c=document.createElement('div');
+    c.className='gcard a-fade'; c.style.animationDelay=(i*35)+'ms';
+    c.innerHTML=`<div class="gthumb"><iframe srcdoc="${esc(item.h)}" sandbox="allow-scripts allow-same-origin"></iframe><div class="gover"><div class="flex items-center gap-2 rounded-xl px-3 py-1.5 border border-white/10" style="background:rgba(0,0,0,.7)"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><span class="font-mono text-w" style="font-size:9.5px">Preview</span></div></div></div><div class="flex items-center justify-between gap-2 p-2.5"><p class="font-mono text-s truncate" style="font-size:9.5px">${esc(item.p)}</p><button onclick="event.stopPropagation();dlSpec(${i})" class="dlb flex-shrink-0" style="width:auto;padding:3px 8px;font-size:9px"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button></div>`;
+    c.querySelector('.gthumb').onclick=()=>openModal(item);
+    grid.appendChild(c);
+  });
+}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+/* ══ MODAL ══ */
+function openModal(item){modalHTML=item.h;document.getElementById('mTitle').textContent=item.p;document.getElementById('mFrame').srcdoc=item.h;document.getElementById('modal').classList.remove('hidden');}
+function closeModal(){document.getElementById('modal').classList.add('hidden');document.getElementById('mFrame').srcdoc='';}
+function dlModal(){dlHTML(modalHTML,'website');}
+
+/* ══ DOWNLOAD ══ */
+function dlFile()    {dlHTML(curHTML,document.getElementById('prompt').value);}
+function dlSpec(i)   {dlHTML(gallery[i].h,gallery[i].p);}
+function dlHTML(h,n) {
+  if (!h) return;
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([h],{type:'text/html'}));
+  a.download=(slug(n)||'website')+'.html';
+  a.click(); URL.revokeObjectURL(a.href);
+}
+
+/* ══ HISTORY ══ */
+function pushHist(p,h) {
+  hist.unshift({p,h}); if(hist.length>12) hist.pop();
+  ['histD','histM'].forEach(id=>{
+    const w=document.getElementById(id); if(!w) return;
+    w.innerHTML='';
+    hist.forEach((item,i)=>{
+      const el=document.createElement('div');
+      el.className='hit'+(i===0?' on':''); el.textContent=item.p;
+      el.onclick=()=>{curHTML=item.h;renderPreview(item.h);document.getElementById('dlBtn').disabled=false;document.getElementById('mobDl').disabled=false;document.getElementById('urlBar').textContent=slug(item.p)+'.html';document.querySelectorAll('.hit').forEach((e,j)=>e.classList.toggle('on',j===i));closeSheet();};
+      w.appendChild(el);
+    });
+  });
+  document.getElementById('histEmptyD').style.display='none';
+  document.getElementById('histEmptyM').style.display='none';
+}
+
+/* ══ STATUS ══ */
+let stT;
+function setStatus(msg,type){
+  ['statusD','statusM'].forEach(id=>{const el=document.getElementById(id);if(!el)return;el.textContent=msg;el.style.color=type==='err'?'#ef4444':type==='ok'?'#00ff88':type==='warn'?'#f59e0b':'#444';});
+  clearTimeout(stT);
+  if(type==='ok') stT=setTimeout(()=>['statusD','statusM'].forEach(id=>{const e=document.getElementById(id);if(e){e.textContent='';e.style.color='#444';}}),5000);
+}
+
+/* ══ MOBILE SHEET ══ */
+function openSheet(){const k=document.getElementById('apiKey').value;if(k)document.getElementById('mobKey').value=k;document.getElementById('mSheet').style.display='block';requestAnimationFrame(()=>document.getElementById('msPanel').classList.add('open'));}
+function closeSheet(){document.getElementById('msPanel').classList.remove('open');setTimeout(()=>{document.getElementById('mSheet').style.display='none';},360);}
+
+/* ══ DEVICE DETECT ══ */
+function detectDevice(){
+  const ua=navigator.userAgent,vw=window.innerWidth,sw=window.screen.width,sh=window.screen.height,dpr=window.devicePixelRatio||1;
+  let os='Unknown',osS='Unknown';
+  if(/iPhone/.test(ua)){os='🍎 iOS (iPhone)';osS='iOS';}else if(/iPad/.test(ua)){os='🍎 iPadOS';osS='iPadOS';}else if(/Android/.test(ua)){os='🤖 Android';osS='Android';}else if(/Mac OS X/.test(ua)){os='🍎 macOS';osS='macOS';}else if(/Windows NT 10/.test(ua)){os='🪟 Windows 11';osS='Win11';}else if(/Windows NT 6/.test(ua)){os='🪟 Windows 8/10';osS='Windows';}else if(/Windows/.test(ua)){os='🪟 Windows';osS='Windows';}else if(/CrOS/.test(ua)){os='🌐 ChromeOS';osS='ChromeOS';}else if(/Linux/.test(ua)){os='🐧 Linux';osS='Linux';}
+  let type='Desktop';
+  if(/Mobi|Android|iPhone/.test(ua)&&vw<768)type='Mobile';else if(/iPad/.test(ua)||(vw>=768&&vw<1100&&/Android/.test(ua)))type='Tablet';
+  let br='Unknown';
+  if(/Edg\//.test(ua))br='Edge';else if(/OPR\//.test(ua))br='Opera';else if(/Chrome\//.test(ua))br='Chrome';else if(/Firefox\//.test(ua))br='Firefox';else if(/Safari\//.test(ua))br='Safari';
+  const display=dpr>=2?`Retina (${dpr}x)`:`Standard (${dpr}x)`;
+  const network=navigator.connection?(navigator.connection.effectiveType||'').toUpperCase()||'—':'—';
+  const hb=document.getElementById('devBadge'); if(hb)hb.textContent=`${osS} · ${type} · ${br}${dpr>=2?' · Retina':''}`;
+  const mb=document.getElementById('devBadgeMob'); if(mb)mb.textContent=`${osS} · ${type}`;
+  const s=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  s('dOS',os);s('dType',type+` (${vw}px)`);s('dBr',br);s('dScr',`${sw}×${sh}`);s('dDis',display);s('dNet',network);
+}
+
+/* ══ UTILS ══ */
+function slug(s){return(s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40);}
+</script>
+</body>
+</html>
