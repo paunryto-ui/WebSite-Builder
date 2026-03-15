@@ -1,931 +1,2449 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>BuildAI — AI Website Builder</title>
-  <script>
-    tailwind = { config: { theme: { extend: {
-      fontFamily: { sans:['Inter','sans-serif'], display:['Bricolage Grotesque','sans-serif'], mono:['JetBrains Mono','monospace'] },
-      colors: { b0:'#000',b1:'#0a0a0a',b2:'#111',b3:'#161616',brd:'#1e1e1e',brd2:'#2a2a2a',
-                m:'#444',s:'#666',l:'#999',w:'#fff',
-                g:'#00ff88',bl:'#3b82f6',pu:'#a855f7' }
-    }}}};
-  </script>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Bricolage+Grotesque:wght@600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
-  <style>
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    html,body{height:100%;background:#000;color:#fff;font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased}
-    ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:#1e1e1e;border-radius:9px}
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>APK Builder — HTML to Android</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:wght@600;700&family=Space+Grotesk:wght@400;500;600&family=Outfit:wght@300;400;600;700&family=Bebas+Neue&family=Raleway:wght@400;600;700&display=swap" rel="stylesheet">
 
-    @keyframes spin  {to{transform:rotate(360deg)}}
-    @keyframes fade  {from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-    @keyframes throb {0%,100%{opacity:1;transform:scale(1)}50%{opacity:.25;transform:scale(.55)}}
-    @keyframes bob   {0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
-    @keyframes scan  {0%{top:-10%}100%{top:110%}}
-    @keyframes bar   {from{background-position:200%}to{background-position:-200%}}
-    @keyframes cdpulse{0%,100%{opacity:1}50%{opacity:.5}}
+<style>
+/* ===== CSS VARIABLES ===== */
+:root {
+  --font-display: 'Syne', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --radius: 14px;
+  --radius-sm: 8px;
+  --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
 
-    .a-spin  {animation:spin 1s linear infinite}
-    .a-fade  {animation:fade .45s cubic-bezier(.16,1,.3,1) both}
-    .a-throb {animation:throb 2s ease-in-out infinite}
-    .a-bob   {animation:bob 3s ease-in-out infinite}
+/* ===== THEMES ===== */
+[data-theme="dark-forest"] {
+  --bg: #0a0f0a;
+  --bg2: #111811;
+  --bg3: #1a231a;
+  --surface: #1e2a1e;
+  --surface2: #253325;
+  --border: #2d3f2d;
+  --accent: #4ade80;
+  --accent2: #86efac;
+  --accent-glow: rgba(74, 222, 128, 0.15);
+  --text: #f0fdf4;
+  --text2: #a7d6b3;
+  --text3: #6b9a78;
+  --danger: #f87171;
+  --warn: #fbbf24;
+  --success: #4ade80;
+}
 
-    .ring{border:2px solid #1e1e1e;border-top-color:#00ff88;border-right-color:#3b82f6;border-radius:50%;animation:spin 1s linear infinite}
-    .bar-fill{transition:width .9s cubic-bezier(.4,0,.2,1)}
+[data-theme="dark-ocean"] {
+  --bg: #040d1a;
+  --bg2: #071224;
+  --bg3: #0d1f3a;
+  --surface: #0f2447;
+  --surface2: #163660;
+  --border: #1e4a7a;
+  --accent: #38bdf8;
+  --accent2: #7dd3fc;
+  --accent-glow: rgba(56, 189, 248, 0.15);
+  --text: #f0f9ff;
+  --text2: #93c5fd;
+  --text3: #5b8fc4;
+  --danger: #f87171;
+  --warn: #fbbf24;
+  --success: #4ade80;
+}
 
-    .grad{background:linear-gradient(90deg,#00ff88,#3b82f6,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-    .grad-ani{background:linear-gradient(90deg,#00ff88,#3b82f6,#a855f7,#00ff88);background-size:300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:bar 3s linear infinite}
+[data-theme="dark-ember"] {
+  --bg: #0f0804;
+  --bg2: #1a1008;
+  --bg3: #271810;
+  --surface: #2e1c12;
+  --surface2: #3d2418;
+  --border: #5a3520;
+  --accent: #fb923c;
+  --accent2: #fdba74;
+  --accent-glow: rgba(251, 146, 60, 0.15);
+  --text: #fff7ed;
+  --text2: #fed7aa;
+  --text3: #c4885a;
+  --danger: #f87171;
+  --warn: #fbbf24;
+  --success: #4ade80;
+}
 
-    .inp{background:#0a0a0a;border:1px solid #1e1e1e;color:#fff;font-family:'JetBrains Mono',monospace;font-size:11.5px;padding:10px 12px;border-radius:12px;outline:none;transition:border-color .2s;caret-color:#00ff88;width:100%}
-    .inp::placeholder{color:#2a2a2a}
-    .inp:focus{border-color:#2a2a2a}
+[data-theme="dark-violet"] {
+  --bg: #08040f;
+  --bg2: #10081a;
+  --bg3: #1a1028;
+  --surface: #1e1535;
+  --surface2: #2a1e4a;
+  --border: #3d2d6a;
+  --accent: #a78bfa;
+  --accent2: #c4b5fd;
+  --accent-glow: rgba(167, 139, 250, 0.15);
+  --text: #faf5ff;
+  --text2: #c4b5fd;
+  --text3: #8b72c8;
+  --danger: #f87171;
+  --warn: #fbbf24;
+  --success: #4ade80;
+}
 
-    .big-inp{background:#0d0d0d;border:1px solid #1e1e1e;color:#fff;font-family:'Inter',sans-serif;font-size:14px;padding:18px 56px 18px 18px;border-radius:14px;outline:none;transition:all .2s;caret-color:#00ff88;width:100%;resize:none;line-height:1.6;min-height:80px}
-    .big-inp::placeholder{color:#2a2a2a}
-    .big-inp:focus{border-color:#2a2a2a;box-shadow:0 0 0 1px #1e1e1e}
+[data-theme="light-clean"] {
+  --bg: #f8fafc;
+  --bg2: #f1f5f9;
+  --bg3: #e2e8f0;
+  --surface: #ffffff;
+  --surface2: #f8fafc;
+  --border: #cbd5e1;
+  --accent: #0ea5e9;
+  --accent2: #38bdf8;
+  --accent-glow: rgba(14, 165, 233, 0.1);
+  --text: #0f172a;
+  --text2: #475569;
+  --text3: #94a3b8;
+  --danger: #ef4444;
+  --warn: #f59e0b;
+  --success: #22c55e;
+}
 
-    .send{position:absolute;right:12px;bottom:12px;width:36px;height:36px;background:#fff;border-radius:10px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0}
-    .send:hover{background:#e5e5e5;transform:scale(1.04)}
-    .send:disabled{background:#1a1a1a;cursor:not-allowed;transform:none}
-    .send:disabled svg{stroke:#333}
+[data-theme="light-warm"] {
+  --bg: #fefce8;
+  --bg2: #fef9c3;
+  --bg3: #fef08a;
+  --surface: #ffffff;
+  --surface2: #fffbeb;
+  --border: #d97706;
+  --accent: #d97706;
+  --accent2: #f59e0b;
+  --accent-glow: rgba(217, 119, 6, 0.1);
+  --text: #1c1917;
+  --text2: #57534e;
+  --text3: #a8a29e;
+  --danger: #ef4444;
+  --warn: #d97706;
+  --success: #22c55e;
+}
 
-    .chip{font-family:'Inter',sans-serif;font-size:11px;padding:5px 12px;border-radius:999px;border:1px solid #1e1e1e;color:#444;background:transparent;cursor:pointer;transition:all .14s;white-space:nowrap}
-    .chip:hover{border-color:#2a2a2a;color:#888}
+/* ===== RESET ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    .tab{font-family:'Inter',sans-serif;font-size:11px;font-weight:500;padding:5px 14px;border-radius:8px;border:none;cursor:pointer;transition:all .14s}
-    .ton{background:#1a1a1a;color:#fff}
-    .toff{background:transparent;color:#444}
-    .toff:hover{color:#888}
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition: background var(--transition), color var(--transition);
+}
 
-    .dlb{display:flex;align-items:center;gap:6px;font-family:'Inter',sans-serif;font-size:12px;font-weight:500;padding:9px 14px;border-radius:10px;border:1px solid #1e1e1e;background:transparent;color:#555;cursor:pointer;transition:all .14s;width:100%;justify-content:center}
-    .dlb:hover:not(:disabled){border-color:#2a2a2a;color:#bbb}
-    .dlb:disabled{opacity:.2;cursor:not-allowed}
+/* ===== SPLASH SCREEN ===== */
+#splash {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  transition: opacity 0.6s ease, visibility 0.6s ease;
+}
 
-    .hit{font-family:'JetBrains Mono',monospace;font-size:10px;padding:6px 10px;border-radius:8px;border:1px solid #1a1a1a;color:#333;cursor:pointer;transition:all .13s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .hit:hover{color:#666;border-color:#222}
-    .hit.on{color:#00ff88;border-color:rgba(0,255,136,.2);background:rgba(0,255,136,.03)}
+#splash.hide {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
 
-    .lbl{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#222}
+.splash-logo {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border-radius: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  margin-bottom: 24px;
+  box-shadow: 0 0 60px var(--accent-glow);
+  animation: splashPulse 1.5s ease-in-out infinite;
+}
 
-    /* model selector */
-    .mdl-sel{background:#0a0a0a;border:1px solid #1e1e1e;color:#555;font-family:'JetBrains Mono',monospace;font-size:10px;padding:8px 10px;border-radius:10px;outline:none;width:100%;cursor:pointer;transition:border-color .2s;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23333' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center}
-    .mdl-sel:hover{border-color:#2a2a2a;color:#888}
-    .mdl-sel option{background:#0d0d0d;color:#888}
+@keyframes splashPulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 40px var(--accent-glow); }
+  50% { transform: scale(1.05); box-shadow: 0 0 80px var(--accent-glow); }
+}
 
-    /* cooldown bar */
-    .cd-wrap{display:none;flex-direction:column;gap:4px}
-    .cd-wrap.show{display:flex}
-    .cd-bar-bg{height:2px;background:#111;border-radius:99px;overflow:hidden}
-    .cd-bar-fg{height:100%;border-radius:99px;background:linear-gradient(90deg,#f59e0b,#ef4444);transition:width .5s linear}
-    .cd-txt{font-family:'JetBrains Mono',monospace;font-size:9px;color:#444;animation:cdpulse 1.5s ease-in-out infinite}
+.splash-title {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.5px;
+  margin-bottom: 8px;
+}
 
-    /* quality badge */
-    .qbadge{font-family:'JetBrains Mono',monospace;font-size:8px;padding:2px 6px;border-radius:99px;border:1px solid #1a1a1a;color:#333}
-    .qbadge.best{color:#00ff88;border-color:rgba(0,255,136,.2);background:rgba(0,255,136,.04)}
-    .qbadge.good{color:#3b82f6;border-color:rgba(59,130,246,.2);background:rgba(59,130,246,.04)}
-    .qbadge.fast{color:#a855f7;border-color:rgba(168,85,247,.2);background:rgba(168,85,247,.04)}
+.splash-sub {
+  font-size: 13px;
+  color: var(--text3);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 40px;
+}
 
-    .gcard{background:#0d0d0d;border:1px solid #1a1a1a;border-radius:12px;overflow:hidden;cursor:pointer;transition:all .2s}
-    .gcard:hover{border-color:#2a2a2a;transform:translateY(-2px);box-shadow:0 12px 40px rgba(0,0,0,.6)}
-    .gthumb{width:100%;aspect-ratio:16/10;background:#111;position:relative;overflow:hidden}
-    .gthumb iframe{width:200%;height:200%;transform:scale(.5);transform-origin:top left;pointer-events:none;border:none}
-    .gover{position:absolute;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s}
-    .gcard:hover .gover{opacity:1}
+.splash-bar {
+  width: 200px;
+  height: 3px;
+  background: var(--border);
+  border-radius: 99px;
+  overflow: hidden;
+}
 
-    .pbox{background:#080808;border:1px solid #1e1e1e;border-radius:20px;padding:44px 52px;min-width:340px;position:relative;overflow:hidden;box-shadow:0 48px 120px rgba(0,0,0,.9)}
-    .pscan{position:absolute;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,255,136,.25),transparent);animation:scan 2.8s ease-in-out infinite}
+.splash-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  border-radius: 99px;
+  animation: splashLoad 2s ease forwards;
+}
 
-    .mback{background:rgba(0,0,0,.88);backdrop-filter:blur(14px)}
+@keyframes splashLoad {
+  from { width: 0%; }
+  to { width: 100%; }
+}
 
-    .mob-bar{height:64px;background:#0a0a0a;border-top:1px solid #1e1e1e;padding:0 14px;gap:8px;align-items:center;display:none;flex-shrink:0}
-    .mob-inp{flex:1;background:#111;border:1px solid #1e1e1e;border-radius:12px;padding:10px 14px;font-family:'Inter',sans-serif;font-size:13px;color:#fff;outline:none;caret-color:#00ff88}
-    .mob-inp::placeholder{color:#2a2a2a}
-    .mob-inp:focus{border-color:#2a2a2a}
-    .mob-ico-btn{width:40px;height:40px;border-radius:10px;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .14s}
+/* ===== LAYOUT ===== */
+.app-wrapper {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 20px 60px;
+}
 
-    .msheet{position:fixed;inset:0;z-index:200;display:none}
-    .msback{position:absolute;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(10px)}
-    .mspanel{position:absolute;bottom:0;left:0;right:0;background:#0a0a0a;border-top:1px solid #1e1e1e;border-radius:20px 20px 0 0;max-height:88vh;overflow-y:auto;padding:16px 18px 48px;display:flex;flex-direction:column;gap:18px;transform:translateY(100%);transition:transform .35s cubic-bezier(.16,1,.3,1)}
-    .mspanel.open{transform:translateY(0)}
-    .mshandle{width:36px;height:3px;background:#1e1e1e;border-radius:99px;margin:0 auto 8px;flex-shrink:0}
+/* ===== HEADER ===== */
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 32px;
+  gap: 16px;
+  flex-wrap: wrap;
+}
 
-    .dcard{background:#111;border:1px solid #1a1a1a;border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:9px}
-    .drow{display:flex;align-items:center;justify-content:space-between}
-    .dlbl{font-family:'JetBrains Mono',monospace;font-size:9px;color:#2a2a2a;text-transform:uppercase;letter-spacing:.08em}
-    .dval{font-family:'JetBrains Mono',monospace;font-size:10px;color:#666}
-    .dval.hi{color:#00ff88}
+.logo-area {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
 
-    @media(max-width:768px){
-      .desk-side{display:none!important}
-      .mob-bar{display:flex!important}
-      .preview-wrap{height:calc(100vh - 52px - 64px)!important}
-    }
-  </style>
+.logo-icon {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.logo-text {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -0.3px;
+}
+
+.logo-badge {
+  font-size: 10px;
+  color: var(--accent);
+  background: var(--accent-glow);
+  border: 1px solid var(--accent);
+  padding: 2px 7px;
+  border-radius: 99px;
+  font-family: var(--font-mono);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* ===== THEME PILL SWITCHER ===== */
+.theme-switcher {
+  display: flex;
+  gap: 6px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  padding: 4px;
+  flex-wrap: wrap;
+}
+
+.theme-dot {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.theme-dot:hover { transform: scale(1.15); }
+.theme-dot.active { border-color: var(--text); transform: scale(1.1); }
+.theme-dot[data-t="dark-forest"] { background: linear-gradient(135deg, #0a0f0a, #4ade80); }
+.theme-dot[data-t="dark-ocean"] { background: linear-gradient(135deg, #040d1a, #38bdf8); }
+.theme-dot[data-t="dark-ember"] { background: linear-gradient(135deg, #0f0804, #fb923c); }
+.theme-dot[data-t="dark-violet"] { background: linear-gradient(135deg, #08040f, #a78bfa); }
+.theme-dot[data-t="light-clean"] { background: linear-gradient(135deg, #f8fafc, #0ea5e9); }
+.theme-dot[data-t="light-warm"] { background: linear-gradient(135deg, #fefce8, #d97706); }
+
+/* Auto theme button */
+.btn-auto-theme {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  padding: 5px 10px;
+  border-radius: 99px;
+  border: 1px solid var(--border);
+  background: var(--bg2);
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.btn-auto-theme:hover, .btn-auto-theme.active {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-glow);
+}
+
+/* ===== STEPPER ===== */
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 32px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.step-num {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  border: 2px solid var(--border);
+  background: var(--bg2);
+  color: var(--text3);
+  transition: all var(--transition);
+  flex-shrink: 0;
+}
+
+.step.active .step-num {
+  border-color: var(--accent);
+  background: var(--accent-glow);
+  color: var(--accent);
+}
+
+.step.done .step-num {
+  border-color: var(--success);
+  background: rgba(74,222,128,0.1);
+  color: var(--success);
+}
+
+.step-label {
+  font-size: 12px;
+  color: var(--text3);
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+.step.active .step-label { color: var(--text); }
+.step.done .step-label { color: var(--success); }
+
+.step-line {
+  flex: 1;
+  height: 2px;
+  background: var(--border);
+  margin: 0 8px;
+  min-width: 20px;
+}
+
+/* ===== SECTIONS ===== */
+.section {
+  display: none;
+  animation: fadeSlide 0.4s ease forwards;
+}
+.section.active { display: block; }
+
+@keyframes fadeSlide {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== CARDS ===== */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 20px;
+  transition: background var(--transition), border-color var(--transition);
+}
+
+.card-title {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-desc {
+  font-size: 13px;
+  color: var(--text3);
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+/* ===== FORM ELEMENTS ===== */
+.form-group {
+  margin-bottom: 16px;
+}
+
+label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text2);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.required::after { content: ' *'; color: var(--accent); }
+
+input[type="text"],
+input[type="password"],
+input[type="number"],
+select,
+textarea {
+  width: 100%;
+  padding: 11px 14px;
+  background: var(--bg2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 14px;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  outline: none;
+  appearance: none;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="number"]:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+  background: var(--bg3);
+}
+
+input::placeholder, textarea::placeholder { color: var(--text3); }
+
+textarea {
+  min-height: 80px;
+  resize: vertical;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.input-with-icon {
+  position: relative;
+}
+
+.input-with-icon input {
+  padding-right: 44px;
+}
+
+.input-icon-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text3);
+  cursor: pointer;
+  padding: 4px;
+  font-size: 16px;
+  transition: color 0.2s;
+}
+
+.input-icon-btn:hover { color: var(--accent); }
+
+.input-hint {
+  font-size: 11px;
+  color: var(--text3);
+  margin-top: 5px;
+  font-family: var(--font-mono);
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+@media (max-width: 500px) {
+  .grid-2 { grid-template-columns: 1fr; }
+}
+
+/* ===== FILE UPLOAD ===== */
+.file-drop {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 32px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  background: var(--bg2);
+}
+
+.file-drop:hover, .file-drop.drag {
+  border-color: var(--accent);
+  background: var(--accent-glow);
+}
+
+.file-drop input[type="file"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+  width: 100%;
+}
+
+.file-drop-icon { font-size: 32px; margin-bottom: 8px; }
+.file-drop-label { font-size: 14px; color: var(--text2); font-weight: 500; }
+.file-drop-sub { font-size: 12px; color: var(--text3); margin-top: 4px; }
+
+.file-preview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg3);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  margin-top: 12px;
+}
+
+.file-preview-icon {
+  font-size: 28px;
+  flex-shrink: 0;
+}
+
+.file-preview-img {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.file-preview-info { flex: 1; min-width: 0; }
+.file-preview-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.file-preview-size { font-size: 11px; color: var(--text3); font-family: var(--font-mono); }
+
+.file-preview-remove {
+  background: none;
+  border: none;
+  color: var(--danger);
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px;
+  flex-shrink: 0;
+}
+
+/* ===== RADIO / SELECT PILLS ===== */
+.pill-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pill {
+  padding: 7px 14px;
+  border-radius: 99px;
+  border: 1.5px solid var(--border);
+  background: var(--bg2);
+  color: var(--text2);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  user-select: none;
+}
+
+.pill:hover { border-color: var(--accent); color: var(--accent); }
+.pill.active {
+  border-color: var(--accent);
+  background: var(--accent-glow);
+  color: var(--accent);
+}
+
+/* ===== FONT PICKER ===== */
+.font-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 10px;
+}
+
+.font-opt {
+  padding: 14px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border);
+  background: var(--bg2);
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.font-opt:hover { border-color: var(--accent); }
+.font-opt.active { border-color: var(--accent); background: var(--accent-glow); }
+
+.font-opt-name {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: var(--text);
+}
+
+.font-opt-label {
+  font-size: 10px;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-family: var(--font-mono);
+}
+
+/* ===== SPLASH PREVIEW ===== */
+.splash-preview-wrap {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.splash-preview-phone {
+  width: 140px;
+  height: 240px;
+  border-radius: 24px;
+  border: 3px solid var(--border);
+  background: var(--bg);
+  overflow: hidden;
+  flex-shrink: 0;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.splash-preview-phone::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  width: 40px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border);
+}
+
+.splash-phone-icon {
+  font-size: 32px;
+}
+
+.splash-phone-name {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text);
+  font-family: var(--font-display);
+  text-align: center;
+  padding: 0 8px;
+}
+
+.splash-phone-bar {
+  width: 60%;
+  height: 3px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.splash-phone-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  border-radius: 2px;
+  width: 70%;
+}
+
+/* ===== RATIO PICKER ===== */
+.ratio-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.ratio-opt {
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg2);
+  padding: 14px 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.ratio-opt:hover { border-color: var(--accent); }
+.ratio-opt.active { border-color: var(--accent); background: var(--accent-glow); }
+.ratio-opt.auto-detected { border-color: var(--warn); }
+
+.ratio-shape {
+  border: 2px solid currentColor;
+  border-radius: 4px;
+  opacity: 0.7;
+}
+
+.ratio-opt-label {
+  font-size: 11px;
+  color: var(--text2);
+  font-family: var(--font-mono);
+  text-align: center;
+}
+
+.ratio-auto-badge {
+  font-size: 9px;
+  color: var(--warn);
+  background: rgba(251,191,36,0.1);
+  border: 1px solid var(--warn);
+  padding: 1px 5px;
+  border-radius: 99px;
+  font-family: var(--font-mono);
+}
+
+/* ===== COLOR PICKER ===== */
+.color-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.color-swatch {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-sm);
+  border: 1.5px solid var(--border);
+  cursor: pointer;
+  overflow: hidden;
+  padding: 2px;
+  background: var(--bg2);
+}
+
+.color-swatch input[type="color"] {
+  width: 100%;
+  height: 100%;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.color-presets {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.color-preset {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.2s;
+}
+.color-preset:hover { transform: scale(1.2); border-color: var(--text); }
+
+/* ===== BUTTONS ===== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 22px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 600;
+  font-family: var(--font-body);
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #000;
+}
+.btn-primary:hover {
+  opacity: 0.85;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px var(--accent-glow);
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1.5px solid var(--border);
+  color: var(--text2);
+}
+.btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+
+.btn-danger {
+  background: rgba(248,113,113,0.1);
+  border: 1.5px solid var(--danger);
+  color: var(--danger);
+}
+.btn-danger:hover { background: rgba(248,113,113,0.2); }
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.btn-lg { padding: 14px 28px; font-size: 15px; }
+.btn-sm { padding: 8px 14px; font-size: 12px; }
+
+.btn-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: 24px;
+  flex-wrap: wrap;
+}
+
+/* ===== LOG / STATUS ===== */
+.log-box {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.8;
+  max-height: 280px;
+  overflow-y: auto;
+  color: var(--text2);
+}
+
+.log-entry { display: flex; gap: 10px; align-items: flex-start; }
+.log-time { color: var(--text3); flex-shrink: 0; }
+.log-ok { color: var(--success); }
+.log-err { color: var(--danger); }
+.log-info { color: var(--accent); }
+.log-warn { color: var(--warn); }
+
+/* ===== PROGRESS ===== */
+.progress-bar {
+  height: 6px;
+  background: var(--border);
+  border-radius: 99px;
+  overflow: hidden;
+  margin: 12px 0;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  border-radius: 99px;
+  transition: width 0.5s ease;
+}
+
+/* ===== RESULT CARD ===== */
+.result-card {
+  background: linear-gradient(135deg, var(--accent-glow), transparent);
+  border: 1.5px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 28px;
+  text-align: center;
+  display: none;
+}
+
+.result-card.show { display: block; }
+.result-icon { font-size: 52px; margin-bottom: 12px; }
+.result-title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.result-sub { font-size: 13px; color: var(--text2); margin-bottom: 24px; }
+
+.download-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+/* ===== DEVICE DETECT BADGE ===== */
+.device-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--accent);
+  background: var(--accent-glow);
+  border: 1px solid var(--accent);
+  padding: 3px 10px;
+  border-radius: 99px;
+}
+
+/* ===== DIVIDER ===== */
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: 20px 0;
+}
+
+/* ===== TAG ===== */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 99px;
+  font-family: var(--font-mono);
+}
+
+.tag-green { background: rgba(74,222,128,0.1); color: var(--success); border: 1px solid rgba(74,222,128,0.3); }
+.tag-blue { background: rgba(56,189,248,0.1); color: #38bdf8; border: 1px solid rgba(56,189,248,0.3); }
+.tag-red { background: rgba(248,113,113,0.1); color: var(--danger); border: 1px solid rgba(248,113,113,0.3); }
+
+/* ===== TOGGLE SWITCH ===== */
+.toggle-switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.toggle-switch input { display: none; }
+.toggle-track {
+  width: 40px;
+  height: 22px;
+  background: var(--border);
+  border-radius: 11px;
+  position: relative;
+  transition: background 0.2s;
+}
+.toggle-switch input:checked + .toggle-track { background: var(--accent); }
+.toggle-thumb {
+  position: absolute;
+  top: 3px; left: 3px;
+  width: 16px; height: 16px;
+  background: #fff;
+  border-radius: 50%;
+  transition: left 0.2s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+}
+.toggle-switch input:checked + .toggle-track .toggle-thumb { left: 21px; }
+
+.card-body-collapsed { display: none; }
+
+/* ===== SCOPE GUIDE ===== */
+.scope-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+.scope-row:last-child { border-bottom: none; }
+.scope-row.required { background: rgba(74,222,128,0.04); }
+.scope-row.optional { background: transparent; }
+.scope-check { font-size: 13px; color: var(--accent); font-weight: 700; width: 14px; flex-shrink: 0; }
+.scope-check.muted { color: var(--text3); }
+.scope-info { flex: 1; min-width: 0; }
+.scope-name { font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: var(--text); display: block; }
+.scope-desc { font-size: 11px; color: var(--text3); display: block; margin-top: 1px; }
+.scope-badge { font-size: 9px; font-family: var(--font-mono); padding: 2px 6px; border-radius: 99px; flex-shrink: 0; letter-spacing: 0.5px; }
+.required-badge { background: rgba(74,222,128,0.12); color: var(--accent); border: 1px solid rgba(74,222,128,0.3); }
+.optional-badge { background: var(--bg2); color: var(--text3); border: 1px solid var(--border); }
+
+/* ===== SCROLL ===== */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg2); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+/* ===== TOOLTIP ===== */
+[data-tip] { position: relative; }
+[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  padding: 5px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  font-family: var(--font-mono);
+  z-index: 100;
+}
+[data-tip]:hover::after { opacity: 1; }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 600px) {
+  .app-wrapper { padding: 0 14px 40px; }
+  header { flex-direction: column; align-items: flex-start; }
+  .ratio-options { grid-template-columns: repeat(2, 1fr); }
+  .font-options { grid-template-columns: repeat(2, 1fr); }
+  .btn-row { justify-content: stretch; }
+  .btn-row .btn { flex: 1; }
+}
+</style>
 </head>
-<body style="height:100vh;overflow:hidden">
+<body data-theme="dark-forest">
 
-<!-- NAV -->
-<nav class="flex-shrink-0 flex items-center justify-between px-5 border-b border-brd bg-b1" style="height:52px">
-  <div class="flex items-center gap-2.5">
-    <div class="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style="background:linear-gradient(135deg,#00ff88,#3b82f6)">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5">
-        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-      </svg>
-    </div>
-    <span class="font-display font-bold text-w" style="font-size:15px">BuildAI</span>
+<!-- ===== SPLASH ===== -->
+<div id="splash">
+  <div class="splash-logo">📦</div>
+  <div class="splash-title">APK Builder</div>
+  <div class="splash-sub">HTML → Android</div>
+  <div class="splash-bar">
+    <div class="splash-bar-fill"></div>
   </div>
-  <div class="flex items-center gap-2">
-    <div class="flex items-center gap-1.5 border border-brd rounded-full px-2.5 py-1">
-      <span class="w-1.5 h-1.5 rounded-full bg-g a-throb"></span>
-      <span id="mdlBadge" class="font-mono text-s" style="font-size:9px">AI · free</span>
+</div>
+
+<!-- ===== MAIN APP ===== -->
+<div class="app-wrapper">
+  <header>
+    <div class="logo-area">
+      <div class="logo-icon">📦</div>
+      <div>
+        <div class="logo-text">APK Builder</div>
+        <div class="logo-badge">HTML → ANDROID</div>
+      </div>
     </div>
-    <div class="border border-brd rounded-full px-2.5 py-1 hidden sm:block">
-      <span id="devBadge" class="font-mono text-s" style="font-size:9px">detecting…</span>
-    </div>
-  </div>
-</nav>
-
-<!-- WORKSPACE -->
-<div class="flex" style="height:calc(100vh - 52px)">
-
-  <!-- SIDEBAR -->
-  <aside class="desk-side flex-shrink-0 flex flex-col border-r border-brd bg-b1 overflow-hidden" style="width:340px">
-    <div class="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
-
-      <!-- API Key -->
-      <div class="flex flex-col gap-1.5">
-        <div class="flex items-center justify-between">
-          <span class="lbl">OpenRouter Key</span>
-          <span class="font-mono rounded-full px-2 py-px border" style="font-size:8px;color:#00ff88;border-color:rgba(0,255,136,.2);background:rgba(0,255,136,.04)">FREE</span>
-        </div>
-        <div class="relative">
-          <input id="apiKey" type="password" class="inp" style="padding-right:36px" placeholder="sk-or-v1-…" autocomplete="off" spellcheck="false"/>
-          <button onclick="toggleEye('apiKey','eyeD')" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-m hover:text-s transition-colors" style="line-height:0">
-            <svg id="eyeD" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
-            </svg>
-          </button>
-        </div>
-        <a href="https://openrouter.ai/keys" target="_blank" class="font-mono text-m hover:text-s transition-colors" style="font-size:9px">↗ Get free key · openrouter.ai/keys</a>
-      </div>
-
-      <!-- Model Selector -->
-      <div class="flex flex-col gap-1.5">
-        <div class="flex items-center justify-between">
-          <span class="lbl">AI Model</span>
-          <span id="qualityBadge" class="qbadge best">BEST</span>
-        </div>
-        <select id="modelSel" class="mdl-sel" onchange="onModelChange()"></select>
-        <p id="modelDesc" class="font-mono text-m" style="font-size:9px;line-height:1.5;color:#333"></p>
-      </div>
-
-      <div class="h-px bg-brd"></div>
-
-      <!-- Prompt -->
-      <div class="flex flex-col gap-1.5">
-        <span class="lbl">Describe your website</span>
-        <div class="relative">
-          <textarea id="prompt" class="big-inp" rows="5"
-            placeholder="e.g. A dark SaaS landing page for an AI writing tool called 'Quill' — sticky nav, hero with animated gradient, 6 feature cards, pricing section, testimonials, footer. Use violet + cyan accent."></textarea>
-          <button id="sendBtn" class="send" onclick="generate()">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-              <line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/>
-            </svg>
-          </button>
-        </div>
-        <p class="font-mono text-m" style="font-size:9px">⌘ + Enter · More detail = better site</p>
-      </div>
-
-      <!-- Cooldown indicator -->
-      <div id="cdWrap" class="cd-wrap">
-        <div class="cd-bar-bg"><div id="cdBar" class="cd-bar-fg" style="width:100%"></div></div>
-        <p id="cdTxt" class="cd-txt">⏳ Cooldown: 30s remaining…</p>
-      </div>
-
-      <!-- Templates -->
-      <div class="flex flex-col gap-1.5">
-        <span class="lbl">Quick templates</span>
-        <div id="chips" class="flex flex-wrap gap-1.5"></div>
-      </div>
-
-      <p id="statusD" class="font-mono text-m" style="font-size:10px;min-height:1rem;transition:color .2s"></p>
-
-      <!-- Download -->
-      <button id="dlBtn" class="dlb" onclick="dlFile()" disabled>
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-          <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
-          <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
-        </svg>
-        Download HTML
+    <div class="header-controls">
+      <button class="btn-auto-theme active" id="btnAutoTheme" onclick="toggleAutoTheme()" data-tip="Auto detect system theme">
+        🌓 Auto
       </button>
-
-      <div class="h-px bg-brd"></div>
-
-      <!-- History -->
-      <div class="flex flex-col gap-1.5">
-        <span class="lbl">History</span>
-        <div id="histD" class="flex flex-col gap-1"></div>
-        <p id="histEmptyD" class="font-mono text-m" style="font-size:9px">No generations yet.</p>
+      <div class="theme-switcher" id="themeSwitcher">
+        <div class="theme-dot active" data-t="dark-forest" onclick="setTheme(this)" data-tip="Forest"></div>
+        <div class="theme-dot" data-t="dark-ocean" onclick="setTheme(this)" data-tip="Ocean"></div>
+        <div class="theme-dot" data-t="dark-ember" onclick="setTheme(this)" data-tip="Ember"></div>
+        <div class="theme-dot" data-t="dark-violet" onclick="setTheme(this)" data-tip="Violet"></div>
+        <div class="theme-dot" data-t="light-clean" onclick="setTheme(this)" data-tip="Light"></div>
+        <div class="theme-dot" data-t="light-warm" onclick="setTheme(this)" data-tip="Warm"></div>
       </div>
     </div>
-  </aside>
+  </header>
 
-  <!-- PREVIEW PANE -->
-  <div class="flex-1 flex flex-col overflow-hidden bg-b0 preview-wrap" style="height:calc(100vh - 52px)">
-    <div class="flex-shrink-0 flex items-center justify-between px-4 border-b border-brd bg-b1" style="height:42px">
-      <div class="flex gap-1.5">
-        <div class="w-3 h-3 rounded-full" style="background:#ff5f57"></div>
-        <div class="w-3 h-3 rounded-full" style="background:#febc2e"></div>
-        <div class="w-3 h-3 rounded-full" style="background:#28c840"></div>
-      </div>
-      <div id="urlBar" class="font-mono text-s border border-brd bg-b1 rounded-lg px-3 py-1 truncate hidden sm:block" style="font-size:9.5px;max-width:320px">buildai://new-website</div>
-      <div class="flex gap-0.5">
-        <button id="tP" class="tab ton" onclick="switchTab('preview')">Preview</button>
-        <button id="tG" class="tab toff" onclick="switchTab('gallery')">Gallery</button>
-        <button id="tC" class="tab toff" onclick="switchTab('code')">Code</button>
-      </div>
+  <!-- STEPPER -->
+  <div class="stepper" id="stepper">
+    <div class="step active" data-step="0">
+      <div class="step-num">1</div>
+      <div class="step-label">GitHub</div>
     </div>
-
-    <div class="flex-1 relative overflow-hidden">
-      <!-- empty state -->
-      <div id="emptyEl" class="absolute inset-0 flex flex-col items-center justify-center gap-5 pointer-events-none select-none">
-        <div class="w-20 h-20 rounded-3xl flex items-center justify-center a-bob" style="background:linear-gradient(135deg,rgba(0,255,136,.07),rgba(59,130,246,.07));border:1px solid #1a1a1a">
-          <svg width="32" height="32" viewBox="0 0 24 24" fill="none">
-            <path d="M12 2L2 7l10 5 10-5-10-5z" stroke="#00ff88" stroke-width="1.5" stroke-linejoin="round"/>
-            <path d="M2 17l10 5 10-5" stroke="#3b82f6" stroke-width="1.5" stroke-linejoin="round"/>
-            <path d="M2 12l10 5 10-5" stroke="#1e1e1e" stroke-width="1.5" stroke-linejoin="round"/>
-          </svg>
-        </div>
-        <div class="text-center">
-          <p class="font-display font-bold" style="font-size:15px;color:#1a1a1a">Your website will appear here</p>
-          <p class="font-mono text-m text-center leading-relaxed mt-2" style="font-size:10px;max-width:220px">Describe what you want → hit <span class="text-g">Generate</span></p>
-        </div>
-      </div>
-
-      <iframe id="frame" class="hidden w-full h-full border-none" style="background:#fff"></iframe>
-
-      <div id="galleryEl" class="hidden absolute inset-0 overflow-auto p-4">
-        <div class="flex items-center justify-between mb-4">
-          <p class="font-display font-bold text-w" style="font-size:15px">Gallery <span id="gCount" class="font-mono text-m" style="font-size:10px;font-weight:400">0 sites</span></p>
-          <p class="font-mono text-m" style="font-size:9px">Click to preview</p>
-        </div>
-        <div id="gGrid" class="grid gap-3" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr))"></div>
-        <div id="gEmpty" class="flex items-center justify-center py-16">
-          <p class="font-mono text-m" style="font-size:10px">Generate a website to see it here.</p>
-        </div>
-      </div>
-
-      <div id="codeEl" class="hidden absolute inset-0 overflow-auto bg-b0 p-5">
-        <pre id="codePre" class="font-mono leading-relaxed whitespace-pre-wrap break-all" style="font-size:11px;color:#444"></pre>
-      </div>
-
-      <!-- PROGRESS OVERLAY -->
-      <div id="progEl" class="hidden absolute inset-0 flex items-center justify-center mback" style="z-index:50">
-        <div class="pbox a-fade flex flex-col items-center gap-5">
-          <div class="pscan"></div>
-          <div class="relative flex items-center justify-center" style="width:72px;height:72px">
-            <div class="ring absolute inset-0" style="border-width:2.5px"></div>
-            <div class="absolute inset-0 rounded-full" style="border:1px solid rgba(0,255,136,.06)"></div>
-            <span id="pEmoji" class="a-bob" style="font-size:2rem;line-height:1">🧠</span>
-          </div>
-          <div class="text-center flex flex-col gap-1">
-            <p id="pLbl" class="font-display font-bold grad-ani" style="font-size:16px">Understanding your prompt…</p>
-            <p id="pSub" class="font-mono text-m" style="font-size:9.5px">Usually takes 15–30 seconds</p>
-          </div>
-          <div class="w-full rounded-full overflow-hidden" style="height:2px;background:#1a1a1a">
-            <div id="pBar" class="bar-fill h-full rounded-full" style="width:2%;background:linear-gradient(90deg,#00ff88,#3b82f6)"></div>
-          </div>
-          <div id="pSteps" class="flex flex-col gap-2.5 w-full"></div>
-        </div>
-      </div>
+    <div class="step-line"></div>
+    <div class="step" data-step="1">
+      <div class="step-num">2</div>
+      <div class="step-label">App Info</div>
+    </div>
+    <div class="step-line"></div>
+    <div class="step" data-step="2">
+      <div class="step-num">3</div>
+      <div class="step-label">Design</div>
+    </div>
+    <div class="step-line"></div>
+    <div class="step" data-step="3">
+      <div class="step-num">4</div>
+      <div class="step-label">HTML File</div>
+    </div>
+    <div class="step-line"></div>
+    <div class="step" data-step="4">
+      <div class="step-num">5</div>
+      <div class="step-label">Build</div>
     </div>
   </div>
-</div>
 
-<!-- MOBILE BOTTOM BAR -->
-<div class="mob-bar fixed bottom-0 left-0 right-0" style="z-index:90">
-  <button class="mob-ico-btn" style="background:#111;border:1px solid #1e1e1e;color:#555" onclick="openSheet()">
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
-    </svg>
-  </button>
-  <input id="mobP" class="mob-inp" placeholder="Describe your website…"/>
-  <button id="mobSend" class="mob-ico-btn send" style="position:static;width:40px;height:40px" onclick="generateMobile()">
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round">
-      <line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/>
-    </svg>
-  </button>
-</div>
+  <!-- ===== STEP 1: GITHUB ===== -->
+  <div class="section active" id="sec-0">
+    <div class="card">
+      <div class="card-title">🐙 GitHub Integration</div>
+      <div class="card-desc">Hubungkan akun GitHub untuk create repo dan trigger CI/CD build otomatis.</div>
 
-<!-- MOBILE SHEET -->
-<div id="mSheet" class="msheet">
-  <div class="msback" onclick="closeSheet()"></div>
-  <div id="msPanel" class="mspanel">
-    <div class="mshandle"></div>
-    <div class="dcard">
-      <div class="flex items-center justify-between">
-        <p class="font-mono text-s" style="font-size:10px;font-weight:600">📱 Your Device</p>
-        <span id="devBadgeMob" class="font-mono" style="font-size:9px;color:#444">detecting…</span>
+      <div class="form-group">
+        <label class="required">GitHub Username</label>
+        <input type="text" id="ghUser" placeholder="your-github-username" oninput="validateGH()">
       </div>
-      <div class="drow"><span class="dlbl">OS</span><span class="dval hi" id="dOS">—</span></div>
-      <div class="drow"><span class="dlbl">Type</span><span class="dval" id="dType">—</span></div>
-      <div class="drow"><span class="dlbl">Browser</span><span class="dval" id="dBr">—</span></div>
-      <div class="drow"><span class="dlbl">Screen</span><span class="dval" id="dScr">—</span></div>
-      <div class="drow"><span class="dlbl">Display</span><span class="dval" id="dDis">—</span></div>
-      <div class="drow"><span class="dlbl">Network</span><span class="dval" id="dNet">—</span></div>
-    </div>
 
-    <!-- API Key mobile -->
-    <div class="flex flex-col gap-1.5">
-      <div class="flex items-center justify-between">
-        <span class="lbl">OpenRouter Key</span>
-        <span class="font-mono rounded-full px-2 py-px border" style="font-size:8px;color:#00ff88;border-color:rgba(0,255,136,.2)">FREE</span>
+      <div class="form-group">
+        <label class="required">Personal Access Token</label>
+        <div class="input-with-icon">
+          <input type="password" id="ghToken" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" oninput="validateGH()">
+          <button class="input-icon-btn" onclick="togglePass('ghToken', this)">👁️</button>
+        </div>
+        <div class="input-hint">Required scopes: repo, workflow &nbsp;·&nbsp; Token disimpan di memory saja, tidak dikirim ke server.</div>
       </div>
-      <div class="relative">
-        <input id="mobKey" type="password" class="inp" style="padding-right:36px" placeholder="sk-or-v1-…" autocomplete="off"/>
-        <button onclick="toggleEye('mobKey','eyeM')" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-m hover:text-s" style="line-height:0">
-          <svg id="eyeM" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
-          </svg>
-        </button>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="required">Repository Name</label>
+          <input type="text" id="ghRepo" placeholder="my-android-app" oninput="sanitizeRepo()">
+          <div class="input-hint">Huruf kecil, angka, dan tanda hubung saja.</div>
+        </div>
+        <div class="form-group">
+          <label>Visibility</label>
+          <select id="ghVisibility">
+            <option value="public">🌐 Public</option>
+            <option value="private">🔒 Private</option>
+          </select>
+        </div>
       </div>
-      <a href="https://openrouter.ai/keys" target="_blank" class="font-mono text-m" style="font-size:9px">↗ openrouter.ai/keys — free</a>
+
+      <button class="btn btn-outline btn-sm" id="btnTestGH" onclick="testGitHub()" disabled>
+        🔗 Test Connection
+      </button>
+      <span id="ghStatus" style="margin-left:10px;font-size:12px;color:var(--text3)"></span>
+
+      <!-- Token Scope Guide -->
+      <div style="margin-top:20px;">
+        <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:10px;display:flex;align-items:center;gap:6px;">
+          🔑 Required Token Scopes
+          <span style="font-size:10px;color:var(--text3);font-family:var(--font-mono);font-weight:400;">— centang ini saat buat token di GitHub</span>
+        </div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;">
+          <div class="scope-row required">
+            <span class="scope-check">✓</span>
+            <div class="scope-info">
+              <span class="scope-name">repo</span>
+              <span class="scope-desc">Full control of private repositories</span>
+            </div>
+            <span class="scope-badge required-badge">REQUIRED</span>
+          </div>
+          <div class="scope-row required">
+            <span class="scope-check">✓</span>
+            <div class="scope-info">
+              <span class="scope-name">workflow</span>
+              <span class="scope-desc">Update GitHub Action workflows</span>
+            </div>
+            <span class="scope-badge required-badge">REQUIRED</span>
+          </div>
+          <div class="scope-row optional">
+            <span class="scope-check muted">○</span>
+            <div class="scope-info">
+              <span class="scope-name" style="opacity:0.5">write:packages</span>
+              <span class="scope-desc">Upload packages to Package Registry</span>
+            </div>
+            <span class="scope-badge optional-badge">SKIP</span>
+          </div>
+          <div class="scope-row optional">
+            <span class="scope-check muted">○</span>
+            <div class="scope-info">
+              <span class="scope-name" style="opacity:0.5">admin:org</span>
+              <span class="scope-desc">Full control of orgs and teams</span>
+            </div>
+            <span class="scope-badge optional-badge">SKIP</span>
+          </div>
+          <div class="scope-row optional">
+            <span class="scope-check muted">○</span>
+            <div class="scope-info">
+              <span class="scope-name" style="opacity:0.5">user / delete_repo / gist / notifications</span>
+              <span class="scope-desc">Semua scope lainnya</span>
+            </div>
+            <span class="scope-badge optional-badge">SKIP</span>
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--text3);margin-top:8px;font-family:var(--font-mono);">
+          💡 Buka <strong style="color:var(--accent)">github.com → Settings → Developer Settings → Personal Access Tokens → Tokens (classic)</strong> · Set expiration sesuai kebutuhan.
+        </div>
+      </div>
     </div>
 
-    <!-- Model selector mobile -->
-    <div class="flex flex-col gap-1.5">
-      <span class="lbl">AI Model</span>
-      <select id="modelSelMob" class="mdl-sel" onchange="onModelChangeMob()"></select>
-    </div>
-
-    <!-- Templates mobile -->
-    <div class="flex flex-col gap-1.5">
-      <span class="lbl">Templates</span>
-      <div id="mobChips" class="flex flex-wrap gap-1.5"></div>
-    </div>
-
-    <!-- Cooldown mobile -->
-    <div id="cdWrapMob" class="cd-wrap">
-      <div class="cd-bar-bg"><div id="cdBarMob" class="cd-bar-fg" style="width:100%"></div></div>
-      <p id="cdTxtMob" class="cd-txt">⏳ Cooldown: 30s remaining…</p>
-    </div>
-
-    <p id="statusM" class="font-mono text-m" style="font-size:10px;min-height:1rem"></p>
-
-    <button id="mobDl" class="dlb" onclick="dlFile()" disabled>
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
-        <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
-      </svg>
-      Download HTML
-    </button>
-
-    <div class="flex flex-col gap-1.5">
-      <span class="lbl">History</span>
-      <div id="histM" class="flex flex-col gap-1"></div>
-      <p id="histEmptyM" class="font-mono text-m" style="font-size:9px">No generations yet.</p>
+    <div class="btn-row">
+      <button class="btn btn-primary btn-lg" onclick="goStep(1)" id="btnStep1Next" disabled>
+        Next: App Info →
+      </button>
     </div>
   </div>
-</div>
 
-<!-- PREVIEW MODAL -->
-<div id="modal" class="hidden fixed inset-0 mback flex items-center justify-center" style="z-index:100">
-  <div class="flex flex-col rounded-2xl border border-brd overflow-hidden" style="width:92vw;height:90vh;background:#080808">
-    <div class="flex items-center justify-between px-4 border-b border-brd flex-shrink-0" style="height:44px">
-      <p id="mTitle" class="font-mono text-s truncate" style="font-size:10px;max-width:60%">preview</p>
-      <div class="flex items-center gap-2">
-        <button onclick="dlModal()" class="dlb" style="width:auto;padding:5px 10px;font-size:10px">
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
-          </svg>Download
-        </button>
-        <button onclick="closeModal()" style="background:none;border:none;color:#444;font-size:18px;cursor:pointer;line-height:1;padding:4px">✕</button>
+  <!-- ===== STEP 2: APP INFO ===== -->
+  <div class="section" id="sec-1">
+    <div class="card">
+      <div class="card-title">📱 App Information</div>
+      <div class="card-desc">Detail dasar tentang aplikasi Android yang akan dibuild.</div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="required">App Name</label>
+          <input type="text" id="appName" placeholder="My Awesome App" oninput="updateSplashPreview()">
+        </div>
+        <div class="form-group">
+          <label class="required">Package ID</label>
+          <input type="text" id="appPackage" placeholder="com.company.myapp">
+          <div class="input-hint">Format: com.nama.app</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Version Name</label>
+          <input type="text" id="appVersion" placeholder="1.0.0" value="1.0.0">
+        </div>
+        <div class="form-group">
+          <label>Version Code</label>
+          <input type="number" id="appVersionCode" placeholder="1" value="1" min="1">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>App Description</label>
+        <textarea id="appDesc" placeholder="Deskripsi singkat tentang app ini..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Build Type</label>
+        <div class="pill-group" id="buildType">
+          <div class="pill active" onclick="setPill(this,'buildType')" data-val="debug">🔧 Debug APK</div>
+          <div class="pill" onclick="setPill(this,'buildType')" data-val="release">📦 Release APK</div>
+          <div class="pill" onclick="setPill(this,'buildType')" data-val="aab">🏪 AAB (Play Store)</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>App Icon</label>
+        <div class="file-drop" id="iconDrop" ondragover="dragOver(event,'iconDrop')" ondragleave="dragLeave('iconDrop')" ondrop="dropFile(event,'iconFile','iconDrop','iconPreview')">
+          <input type="file" id="iconFile" accept="image/*" onchange="previewFile('iconFile','iconPreview')">
+          <div class="file-drop-icon">🖼️</div>
+          <div class="file-drop-label">Upload App Icon</div>
+          <div class="file-drop-sub">PNG/JPG · Rekomendasi 512×512px</div>
+        </div>
+        <div id="iconPreview" style="display:none"></div>
       </div>
     </div>
-    <iframe id="mFrame" class="flex-1 border-none" style="background:#fff"></iframe>
+
+    <div class="btn-row">
+      <button class="btn btn-outline" onclick="goStep(0)">← Back</button>
+      <button class="btn btn-primary btn-lg" onclick="goStep(2)">Next: Design →</button>
+    </div>
+  </div>
+
+  <!-- ===== STEP 3: DESIGN ===== -->
+  <div class="section" id="sec-2">
+
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+        <div class="card-title" style="margin-bottom:0">🎨 Splash Screen</div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="toggleSplash" checked onchange="toggleCard('splashBody',this)">
+          <span class="toggle-track"><span class="toggle-thumb"></span></span>
+        </label>
+      </div>
+      <div class="card-desc">Tampilan awal saat app dibuka. Preview real-time.</div>
+
+      <div id="splashBody">
+        <div class="splash-preview-wrap">
+          <div class="splash-preview-phone" id="splashPhone">
+            <div class="splash-phone-icon" id="splashIconPreview">📦</div>
+            <div class="splash-phone-name" id="splashNamePreview">App Name</div>
+            <div class="splash-phone-bar"><div class="splash-phone-bar-fill"></div></div>
+          </div>
+
+          <div style="flex:1;min-width:200px">
+            <div class="form-group">
+              <label>Splash Background Color</label>
+              <div class="color-row">
+                <div class="color-swatch"><input type="color" id="splashBg" value="#0a0f0a" oninput="updateSplashPreview()"></div>
+                <div class="color-presets">
+                  <div class="color-preset" style="background:#0a0f0a" onclick="setColor('splashBg','#0a0f0a')" data-tip="Dark"></div>
+                  <div class="color-preset" style="background:#040d1a" onclick="setColor('splashBg','#040d1a')" data-tip="Navy"></div>
+                  <div class="color-preset" style="background:#ffffff" onclick="setColor('splashBg','#ffffff')" data-tip="White"></div>
+                  <div class="color-preset" style="background:#1a1a2e" onclick="setColor('splashBg','#1a1a2e')" data-tip="Midnight"></div>
+                  <div class="color-preset" style="background:#0f0804" onclick="setColor('splashBg','#0f0804')" data-tip="Dark Brown"></div>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Accent / Loading Color</label>
+              <div class="color-row">
+                <div class="color-swatch"><input type="color" id="splashAccent" value="#4ade80" oninput="updateSplashPreview()"></div>
+                <div class="color-presets">
+                  <div class="color-preset" style="background:#4ade80" onclick="setColor('splashAccent','#4ade80')"></div>
+                  <div class="color-preset" style="background:#38bdf8" onclick="setColor('splashAccent','#38bdf8')"></div>
+                  <div class="color-preset" style="background:#fb923c" onclick="setColor('splashAccent','#fb923c')"></div>
+                  <div class="color-preset" style="background:#a78bfa" onclick="setColor('splashAccent','#a78bfa')"></div>
+                  <div class="color-preset" style="background:#f472b6" onclick="setColor('splashAccent','#f472b6')"></div>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Splash Style</label>
+              <div class="pill-group" id="splashStyle">
+                <div class="pill active" onclick="setPill(this,'splashStyle')" data-val="center">⬛ Center</div>
+                <div class="pill" onclick="setPill(this,'splashStyle')" data-val="top">⬆ Top</div>
+                <div class="pill" onclick="setPill(this,'splashStyle')" data-val="gradient">🌈 Gradient</div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Loading Duration (ms)</label>
+              <input type="number" id="splashDuration" value="2000" min="500" max="10000" step="500">
+              <div class="input-hint">Waktu tampil splash sebelum app muncul.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+        <div class="card-title" style="margin-bottom:0">🔤 Font App</div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="toggleFont" checked onchange="toggleCard('fontBody',this)">
+          <span class="toggle-track"><span class="toggle-thumb"></span></span>
+        </label>
+      </div>
+      <div class="card-desc">Font yang digunakan di dalam WebView. Diinject otomatis ke HTML.</div>
+
+      <div id="fontBody">
+        <div class="font-options" id="fontPicker">
+          <div class="font-opt active" onclick="setFont(this)" data-font="Syne">
+            <div class="font-opt-name" style="font-family:'Syne',sans-serif">Syne</div>
+            <div class="font-opt-label">Bold Display</div>
+          </div>
+          <div class="font-opt" onclick="setFont(this)" data-font="DM Sans">
+            <div class="font-opt-name" style="font-family:'DM Sans',sans-serif">DM Sans</div>
+            <div class="font-opt-label">Clean Body</div>
+          </div>
+          <div class="font-opt" onclick="setFont(this)" data-font="Outfit">
+            <div class="font-opt-name" style="font-family:'Outfit',sans-serif">Outfit</div>
+            <div class="font-opt-label">Modern</div>
+          </div>
+          <div class="font-opt" onclick="setFont(this)" data-font="Playfair Display">
+            <div class="font-opt-name" style="font-family:'Playfair Display',serif">Playfair</div>
+            <div class="font-opt-label">Elegant Serif</div>
+          </div>
+          <div class="font-opt" onclick="setFont(this)" data-font="Raleway">
+            <div class="font-opt-name" style="font-family:'Raleway',sans-serif">Raleway</div>
+            <div class="font-opt-label">Stylish</div>
+          </div>
+          <div class="font-opt" onclick="setFont(this)" data-font="Bebas Neue">
+            <div class="font-opt-name" style="font-family:'Bebas Neue',sans-serif">Bebas</div>
+            <div class="font-opt-label">Impact</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+        <div class="card-title" style="margin-bottom:0">📐 Orientation & Ratio</div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="toggleRatio" checked onchange="toggleCard('ratioBody',this)">
+          <span class="toggle-track"><span class="toggle-thumb"></span></span>
+        </label>
+      </div>
+      <div class="card-desc">
+        Orientasi layar.
+        <span class="device-badge" id="deviceBadge">🔍 Detecting...</span>
+      </div>
+
+      <div id="ratioBody">
+        <div class="ratio-options" id="ratioOptions">
+          <div class="ratio-opt" onclick="setRatio(this)" data-val="portrait">
+            <div class="ratio-shape" style="width:28px;height:44px;color:var(--text3)"></div>
+            <div class="ratio-opt-label">Portrait<br>9:16</div>
+          </div>
+          <div class="ratio-opt" onclick="setRatio(this)" data-val="landscape">
+            <div class="ratio-shape" style="width:44px;height:28px;color:var(--text3)"></div>
+            <div class="ratio-opt-label">Landscape<br>16:9</div>
+          </div>
+          <div class="ratio-opt active" onclick="setRatio(this)" data-val="adaptive">
+            <div class="ratio-shape" style="width:32px;height:32px;color:var(--text3)"></div>
+            <div class="ratio-opt-label">Adaptive<br>Auto<div class="ratio-auto-badge">AUTO</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-outline" onclick="goStep(1)">← Back</button>
+      <button class="btn btn-primary btn-lg" onclick="goStep(3)">Next: HTML File →</button>
+    </div>
+  </div>
+
+  <!-- ===== STEP 4: HTML FILE ===== -->
+  <div class="section" id="sec-3">
+    <div class="card">
+      <div class="card-title">📄 Upload HTML File</div>
+      <div class="card-desc">Upload file HTML app yang mau dibuild jadi APK. Bisa single file atau multi-file (zip).</div>
+
+      <div class="pill-group" id="htmlInputMode" style="margin-bottom:16px">
+        <div class="pill active" onclick="setPill(this,'htmlInputMode');toggleHtmlMode('upload')" data-val="upload">📁 Upload File</div>
+        <div class="pill" onclick="setPill(this,'htmlInputMode');toggleHtmlMode('paste')" data-val="paste">📝 Paste Code</div>
+        <div class="pill" onclick="setPill(this,'htmlInputMode');toggleHtmlMode('url')" data-val="url">🔗 URL</div>
+      </div>
+
+      <div id="htmlModeUpload">
+        <div class="file-drop" id="htmlDrop" ondragover="dragOver(event,'htmlDrop')" ondragleave="dragLeave('htmlDrop')" ondrop="dropFile(event,'htmlFile','htmlDrop','htmlPreview')">
+          <input type="file" id="htmlFile" accept=".html,.zip,.htm" onchange="previewFile('htmlFile','htmlPreview')">
+          <div class="file-drop-icon">📄</div>
+          <div class="file-drop-label">Upload index.html atau .zip</div>
+          <div class="file-drop-sub">Drag & drop atau klik untuk browse</div>
+        </div>
+        <div id="htmlPreview" style="display:none"></div>
+      </div>
+
+      <div id="htmlModePaste" style="display:none">
+        <div class="form-group">
+          <label>Paste HTML Code</label>
+          <textarea id="htmlCode" style="min-height:200px" placeholder="<!DOCTYPE html>&#10;<html>&#10;  ...&#10;</html>"></textarea>
+        </div>
+      </div>
+
+      <div id="htmlModeUrl" style="display:none">
+        <div class="form-group">
+          <label>Website URL</label>
+          <input type="text" id="htmlUrl" placeholder="https://yourdomain.com">
+          <div class="input-hint">App akan load URL ini sebagai WebView.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">⚙️ Advanced Options</div>
+      <div class="card-desc">Konfigurasi tambahan untuk behavior app Android.</div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Min Android API</label>
+          <select id="minApi">
+            <option value="21">API 21 (Android 5.0)</option>
+            <option value="23">API 23 (Android 6.0)</option>
+            <option value="24" selected>API 24 (Android 7.0)</option>
+            <option value="26">API 26 (Android 8.0)</option>
+            <option value="28">API 28 (Android 9.0)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Target Android API</label>
+          <select id="targetApi">
+            <option value="33">API 33 (Android 13)</option>
+            <option value="34" selected>API 34 (Android 14)</option>
+            <option value="35">API 35 (Android 15)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>WebView Permissions</label>
+        <div class="pill-group" id="permissions" style="gap:6px">
+          <div class="pill" onclick="togglePill(this)" data-val="camera">📷 Camera</div>
+          <div class="pill" onclick="togglePill(this)" data-val="microphone">🎤 Microphone</div>
+          <div class="pill active" onclick="togglePill(this)" data-val="internet">🌐 Internet</div>
+          <div class="pill" onclick="togglePill(this)" data-val="location">📍 Location</div>
+          <div class="pill" onclick="togglePill(this)" data-val="storage">💾 Storage</div>
+          <div class="pill" onclick="togglePill(this)" data-val="vibrate">📳 Vibrate</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-outline" onclick="goStep(2)">← Back</button>
+      <button class="btn btn-primary btn-lg" onclick="goStep(4);startBuild()">🚀 Build APK →</button>
+    </div>
+  </div>
+
+  <!-- ===== STEP 5: BUILD ===== -->
+  <div class="section" id="sec-4">
+    <div class="card">
+      <div class="card-title">🚀 Building Your App</div>
+      <div class="card-desc">Proses build berjalan di GitHub Actions. Estimasi waktu: <strong>3-8 menit</strong>.</div>
+
+      <div class="progress-bar">
+        <div class="progress-fill" id="buildProgress" style="width:0%"></div>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <span id="buildStatusText" style="font-size:13px;color:var(--text2)">Initializing...</span>
+        <span id="buildPercent" style="font-family:var(--font-mono);font-size:13px;color:var(--accent)">0%</span>
+      </div>
+
+      <div class="log-box" id="buildLog">
+        <div class="log-entry"><span class="log-time">00:00</span><span class="log-info">APK Builder ready.</span></div>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">
+        <span id="buildJobId" style="font-size:11px;font-family:var(--font-mono);color:var(--text3)"></span>
+        <a id="buildGHLink" href="#" target="_blank" style="font-size:11px;color:var(--accent);display:none">🔗 Lihat di GitHub Actions</a>
+      </div>
+    </div>
+
+    <div class="result-card" id="resultCard">
+      <div class="result-icon">🎉</div>
+      <div class="result-title">Build Successful!</div>
+      <div class="result-sub" id="resultDesc">APK berhasil dibuild dan siap didownload.</div>
+      <div class="download-btns">
+        <a id="dlAPK" href="#" class="btn btn-primary btn-lg">⬇️ Download APK</a>
+        <a id="dlAAB" href="#" class="btn btn-outline btn-lg" style="display:none">⬇️ Download AAB</a>
+        <button class="btn btn-outline" onclick="goStep(0);resetBuild()">🔄 Build Lagi</button>
+      </div>
+    </div>
+
+    <div class="card" id="errorCard" style="display:none;border-color:var(--danger)">
+      <div class="card-title" style="color:var(--danger)">❌ Build Failed</div>
+      <div id="errorDesc" style="font-size:13px;color:var(--text2);margin-top:8px"></div>
+      <div class="btn-row" style="margin-top:16px">
+        <button class="btn btn-outline" onclick="goStep(0);resetBuild()">← Start Over</button>
+        <button class="btn btn-primary" onclick="startBuild()">🔄 Retry</button>
+      </div>
+    </div>
   </div>
 </div>
 
 <script>
-/* ══════════════════════════════════════
-   MODEL REGISTRY — Curated best free models (Mar 2026)
-   Priority order: best quality first, fallback to faster/lighter
-══════════════════════════════════════ */
-const MODELS = [
-  {
-    id:    'deepseek/deepseek-chat-v3-0324:free',
-    name:  'DeepSeek V3 0324',
-    desc:  'Top-tier free model. Best overall quality for HTML/CSS generation. 164K context.',
-    tier:  'best',
-  },
-  {
-    id:    'meta-llama/llama-4-maverick:free',
-    name:  'Llama 4 Maverick',
-    desc:  'Meta flagship MoE model. Exceptional at creative layouts + code. 1M context.',
-    tier:  'best',
-  },
-  {
-    id:    'qwen/qwen3-235b-a22b:free',
-    name:  'Qwen3 235B A22B',
-    desc:  'Alibaba giant MoE — strongest at complex multi-section pages. 131K context.',
-    tier:  'best',
-  },
-  {
-    id:    'google/gemini-2.5-pro-exp-03-25:free',
-    name:  'Gemini 2.5 Pro Exp',
-    desc:  'Google\'s smartest free model. Great reasoning + design sense. 1M context.',
-    tier:  'best',
-  },
-  {
-    id:    'meta-llama/llama-4-scout:free',
-    name:  'Llama 4 Scout',
-    desc:  'Lighter Llama 4 variant. Fast & reliable. Good for simpler pages. 512K context.',
-    tier:  'good',
-  },
-  {
-    id:    'mistralai/mistral-small-3.1-24b-instruct:free',
-    name:  'Mistral Small 3.1',
-    desc:  'Solid European model. Consistent HTML output. 128K context.',
-    tier:  'good',
-  },
-  {
-    id:    'meta-llama/llama-3.3-70b-instruct:free',
-    name:  'Llama 3.3 70B',
-    desc:  'Battle-tested workhorse. Very reliable fallback. 131K context.',
-    tier:  'good',
-  },
-  {
-    id:    'openrouter/free',
-    name:  'Auto-Router (Any Free)',
-    desc:  'OpenRouter picks the best available model automatically. Good as last resort.',
-    tier:  'fast',
-  },
-];
+// ===== STATE =====
+let state = {
+  currentStep: 0,
+  theme: 'dark-forest',
+  autoTheme: true,
+  font: 'Syne',
+  ratio: 'adaptive',
+  buildType: 'debug',
+  splashStyle: 'center',
+  htmlMode: 'upload',
+  buildInterval: null,
+  buildPhase: 0,
+  runId: null,
+  ghLink: '',
+};
 
-const API  = 'https://openrouter.ai/api/v1/chat/completions';
-const DKEY = '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';
-const CD   = 30; // cooldown seconds
-
-const TMPLS = [
-  'SaaS landing','Portfolio','Restaurant','Startup pitch',
-  'Blog home','Agency','App landing','E-commerce','Personal CV','NFT project'
-];
-
-const STEPS = [
-  { e:'🧠', t:'Understanding your prompt…',   s:'Analyzing content & intent'          },
-  { e:'🏗️',  t:'Planning sections…',          s:'Nav · Hero · Features · CTA · Footer'},
-  { e:'🎨', t:'Designing visual style…',      s:'Colors, fonts & spacing system'      },
-  { e:'💻', t:'Writing HTML…',               s:'Semantic structure & layout'          },
-  { e:'✨', t:'Styling with CSS…',           s:'Animations, gradients & responsive'   },
-  { e:'⚡', t:'Adding interactions…',         s:'Scroll effects & hover states'        },
-  { e:'🚀', t:'Finalizing…',                 s:'Cleaning & packaging output'          },
-];
-
-const SYS = `You are BuildAI. Generate a complete, single-file HTML website based EXACTLY on what the user describes.
-
-ABSOLUTE OUTPUT RULES — NEVER BREAK:
-- Output ONLY the raw HTML. First character must be < from <!DOCTYPE html>
-- NO text before or after HTML. NO markdown. NO code fences. NO explanations.
-- All CSS inside one <style> tag in <head>. All JS inside one <script> tag before </body>.
-- Only allowed external resource: Google Fonts via @import in CSS
-
-READ THE PROMPT CAREFULLY AND FOLLOW IT:
-- Use the EXACT brand/product name the user gave
-- Include every section and feature they mentioned
-- Match their described tone, industry, style
-- Use any colors they specified; if not, pick a palette that perfectly fits the industry
-- Write ALL copy specifically for THEIR brand — names, taglines, features, CTAs
-
-REQUIRED SECTIONS — include ALL:
-1. NAVIGATION — sticky, blur backdrop, logo + 4 links + CTA button, working mobile hamburger
-2. HERO — 100vh, clamp(3rem,6vw,7rem) headline weight 800, subtext, 2 buttons, animated background, fade-up entrance
-3. FEATURES — 3-6 cards grid, icon box + bold title + description, hover glow lift
-4. SOCIAL PROOF — 3 testimonial cards OR stats row
-5. PRICING or CTA — 3 tiers or full-width gradient CTA
-6. FOOTER — dark, 3-4 columns, SVG social icons, copyright
-
-TECHNICAL:
-- Google Fonts: 1 display + 1 body font — NEVER system fonts
-- CSS variables: --primary, --accent, --bg, --surface, --text, --muted
-- IntersectionObserver fade-up on ALL sections
-- CSS Grid + Flexbox only
-- All hovers: 200ms transitions, translateY(-2px) + glow
-- Mobile responsive with hamburger <768px
-
-COPY: Zero Lorem Ipsum. Every word specific to the brand.
-
-PRELOADER — MANDATORY:
-Add right after <body>:
-<div class="preloader" id="preloader"><span></span><span></span><span></span><span></span><span></span></div>
-CSS: .preloader{position:fixed;top:0;left:0;width:100%;height:100%;background:var(--bg,#000);display:flex;align-items:center;justify-content:center;gap:7px;z-index:9999;transition:opacity .5s ease,visibility .5s ease} .preloader.hidden{opacity:0;visibility:hidden} .preloader span{display:block;width:15px;height:15px;border-radius:10px;background:var(--primary,#19e3d5);margin:0 7px;animation:preloaderBounce 1.2s infinite} .preloader span:nth-child(1){animation-delay:.15s} .preloader span:nth-child(2){animation-delay:.3s} .preloader span:nth-child(3){animation-delay:.45s} .preloader span:nth-child(4){animation-delay:.6s} .preloader span:nth-child(5){animation-delay:.75s} @keyframes preloaderBounce{0%{height:15px}50%{height:60px;background:var(--accent,#d33deb)}100%{height:15px}}
-JS: window.addEventListener('load',()=>{setTimeout(()=>{document.getElementById('preloader').classList.add('hidden');},300);});
-
-Output the complete HTML file. Start with <!DOCTYPE html>. Nothing else.`;
-
-/* ══ STATE ══ */
-let curHTML   = '';
-let gallery   = [];
-let hist      = [];
-let curTab    = 'preview';
-let modalHTML = '';
-const timers  = [];
-
-// Cooldown state
-let cdActive  = false;
-let cdTimer   = null;
-let cdInterval= null;
-let cdRemain  = 0;
-
-/* ══ INIT ══ */
-document.getElementById('apiKey').value = DKEY;
-buildModelSelectors();
-buildChips();
-document.getElementById('prompt').addEventListener('keydown', e => {
-  if ((e.metaKey||e.ctrlKey) && e.key==='Enter') generate();
+// ===== SPLASH HIDE =====
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.getElementById('splash').classList.add('hide');
+  }, 2200);
 });
-detectDevice();
 
-/* ══ MODEL SELECTORS ══ */
-function buildModelSelectors() {
-  ['modelSel','modelSelMob'].forEach(id => {
-    const sel = document.getElementById(id); if (!sel) return;
-    MODELS.forEach((m,i) => {
-      const opt = document.createElement('option');
-      opt.value = m.id;
-      opt.textContent = m.name + (m.tier==='best'?' ★':'');
-      sel.appendChild(opt);
-    });
-  });
-  updateModelMeta();
-}
-
-function onModelChange() {
-  const id = document.getElementById('modelSel').value;
-  document.getElementById('modelSelMob').value = id;
-  updateModelMeta();
-}
-function onModelChangeMob() {
-  const id = document.getElementById('modelSelMob').value;
-  document.getElementById('modelSel').value = id;
-  updateModelMeta();
-}
-
-function updateModelMeta() {
-  const id = document.getElementById('modelSel').value;
-  const m  = MODELS.find(x=>x.id===id) || MODELS[0];
-  const bd = document.getElementById('qualityBadge');
-  const de = document.getElementById('modelDesc');
-  if (bd) { bd.className='qbadge '+m.tier; bd.textContent=m.tier.toUpperCase(); }
-  if (de) { de.textContent=m.desc; }
-  document.getElementById('mdlBadge').textContent = m.name.split(' ').slice(0,2).join(' ') + ' · free';
-}
-
-function getSelectedModel() {
-  return document.getElementById('modelSel').value || MODELS[0].id;
-}
-
-/* ══ CHIPS ══ */
-function buildChips() {
-  ['chips','mobChips'].forEach(id => {
-    const w = document.getElementById(id); if (!w) return;
-    TMPLS.forEach(t => {
-      const b = document.createElement('button');
-      b.className = 'chip';
-      b.textContent = t;
-      b.onclick = () => {
-        document.getElementById('prompt').value = t;
-        document.getElementById('mobP').value   = t;
-        if (id==='mobChips') closeSheet();
-        document.getElementById('prompt').focus?.();
-      };
-      w.appendChild(b);
-    });
-  });
-}
-
-/* ══ COOLDOWN ══ */
-function startCooldown() {
-  cdActive  = true;
-  cdRemain  = CD;
-  setGenBtnsDisabled(true);
-  showCD(true);
-
-  clearInterval(cdInterval);
-  cdInterval = setInterval(() => {
-    cdRemain--;
-    updateCDUI(cdRemain);
-    if (cdRemain <= 0) endCooldown();
-  }, 1000);
-}
-
-function endCooldown() {
-  clearInterval(cdInterval);
-  cdActive = false;
-  setGenBtnsDisabled(false);
-  showCD(false);
-}
-
-function showCD(v) {
-  ['cdWrap','cdWrapMob'].forEach(id => {
-    const el = document.getElementById(id); if (el) el.classList.toggle('show', v);
-  });
-}
-
-function updateCDUI(s) {
-  const pct = (s / CD) * 100;
-  const txt = `⏳ Cooldown: ${s}s remaining — prevents rate limiting`;
-  ['cdBar','cdBarMob'].forEach(id => {
-    const el=document.getElementById(id); if(el) el.style.width=pct+'%';
-  });
-  ['cdTxt','cdTxtMob'].forEach(id => {
-    const el=document.getElementById(id); if(el) el.textContent=txt;
-  });
-}
-
-function setGenBtnsDisabled(v) {
-  document.getElementById('sendBtn').disabled = v;
-  document.getElementById('mobSend').disabled = v;
-}
-
-/* ══ EYE TOGGLE ══ */
-function toggleEye(inputId, iconId) {
-  const inp  = document.getElementById(inputId);
-  const ico  = document.getElementById(iconId);
-  const show = inp.type==='password';
-  inp.type   = show ? 'text' : 'password';
-  ico.innerHTML = show
-    ? `<path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/>
-       <path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/>
-       <line x1="1" y1="1" x2="23" y2="23"/>`
-    : `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`;
-}
-
-/* ══ TABS ══ */
-function switchTab(t) {
-  curTab = t;
-  ['P','G','C'].forEach(id => {
-    document.getElementById('t'+id).className = 'tab ' +
-      ((id==='P'&&t==='preview')||(id==='G'&&t==='gallery')||(id==='C'&&t==='code') ? 'ton':'toff');
-  });
-  document.getElementById('frame').classList.toggle('hidden',    !(t==='preview'&&curHTML));
-  document.getElementById('galleryEl').classList.toggle('hidden', t!=='gallery');
-  document.getElementById('codeEl').classList.toggle('hidden',    t!=='code');
-  if (t==='gallery') renderGallery();
-}
-
-/* ══ PROGRESS ══ */
-function showProg() {
-  const el   = document.getElementById('progEl');
-  const list = document.getElementById('pSteps');
-  el.classList.remove('hidden');
-  list.innerHTML = STEPS.map((s,i) =>
-    `<div id="row${i}" class="flex items-start gap-3" style="animation:fade .3s ease ${i*45}ms both">
-      <span id="dot${i}" style="width:5px;height:5px;border-radius:50%;background:#1a1a1a;margin-top:4px;flex-shrink:0;transition:all .3s"></span>
-      <div>
-        <p id="rt${i}" class="font-mono" style="font-size:10.5px;color:#1e1e1e;transition:color .3s">${s.t}</p>
-        <p id="rs${i}" class="font-mono" style="font-size:9px;color:#161616;transition:color .3s;margin-top:1px">${s.s}</p>
-      </div>
-    </div>`
-  ).join('');
-  setStep(0);
-  [0,2200,4800,7600,11000,15000,19500].forEach((d,i) => {
-    timers.push(setTimeout(() => { if (!el.classList.contains('hidden')) setStep(i); }, d));
-  });
-}
-
-function setStep(i) {
-  document.getElementById('pBar').style.width   = Math.max(2,Math.round((i/(STEPS.length-1))*85))+'%';
-  document.getElementById('pLbl').textContent   = STEPS[i].t;
-  document.getElementById('pEmoji').textContent = STEPS[i].e;
-  document.getElementById('pSub').textContent   = STEPS[i].s;
-  STEPS.forEach((_,j) => {
-    const dot=document.getElementById('dot'+j), rt=document.getElementById('rt'+j), rs=document.getElementById('rs'+j);
-    if (!dot) return;
-    if      (j<i) { dot.style.background='#00ff88'; if(rt) rt.style.color='#00ff88'; if(rs) rs.style.color='#2a2a2a'; }
-    else if (j===i){ dot.style.background='#3b82f6'; if(rt) rt.style.color='#fff';    if(rs) rs.style.color='#555'; }
-    else           { dot.style.background='#1a1a1a'; if(rt) rt.style.color='#1e1e1e'; if(rs) rs.style.color='#161616'; }
-  });
-}
-
-function hideProg(ok) {
-  timers.forEach(clearTimeout); timers.length=0;
-  const el = document.getElementById('progEl');
-  if (ok) {
-    document.getElementById('pBar').style.width   = '100%';
-    document.getElementById('pLbl').textContent   = 'Website ready!';
-    document.getElementById('pEmoji').textContent = '🎉';
-    document.getElementById('pSub').textContent   = 'Rendering preview…';
-    STEPS.forEach((_,j) => {
-      const d=document.getElementById('dot'+j), r=document.getElementById('rt'+j);
-      if(d) d.style.background='#00ff88'; if(r) r.style.color='#00ff88';
-    });
-    setTimeout(()=>el.classList.add('hidden'),900);
-  } else { el.classList.add('hidden'); }
-}
-
-/* ══ GENERATE ══ */
-async function generate() {
-  if (cdActive) {
-    setStatus(`⏳ Wait ${cdRemain}s before generating again.`, 'warn'); return;
+// ===== AUTO THEME =====
+function detectSystemTheme() {
+  const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const hour = new Date().getHours();
+  if (isDark || hour < 7 || hour >= 19) {
+    return 'dark-forest';
   }
-  const p   = document.getElementById('prompt').value.trim();
-  const key = (document.getElementById('apiKey').value || document.getElementById('mobKey').value || '').trim();
-  if (!p)   { setStatus('⚠ Describe your website first.', 'warn'); return; }
-  if (!key) { setStatus('⚠ Enter your OpenRouter API key.', 'warn'); return; }
+  return 'light-clean';
+}
 
-  const model     = getSelectedModel();
-  const modelInfo = MODELS.find(m=>m.id===model) || MODELS[0];
+function toggleAutoTheme() {
+  state.autoTheme = !state.autoTheme;
+  const btn = document.getElementById('btnAutoTheme');
+  if (state.autoTheme) {
+    btn.classList.add('active');
+    applyAutoTheme();
+  } else {
+    btn.classList.remove('active');
+  }
+}
 
-  setGenBtnsDisabled(true);
-  showProg();
-  setStatus('Connecting · ' + modelInfo.name + '…', '');
+function applyAutoTheme() {
+  if (!state.autoTheme) return;
+  const theme = detectSystemTheme();
+  applyTheme(theme);
+}
+
+function applyTheme(theme) {
+  document.body.setAttribute('data-theme', theme);
+  state.theme = theme;
+  document.querySelectorAll('.theme-dot').forEach(d => {
+    d.classList.toggle('active', d.dataset.t === theme);
+  });
+}
+
+function setTheme(el) {
+  state.autoTheme = false;
+  document.getElementById('btnAutoTheme').classList.remove('active');
+  applyTheme(el.dataset.t);
+}
+
+// Listen for system theme changes
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+  if (state.autoTheme) applyAutoTheme();
+});
+
+// Also watch time-of-day (check every minute)
+setInterval(() => { if (state.autoTheme) applyAutoTheme(); }, 60000);
+
+// Initial auto theme
+applyAutoTheme();
+
+// ===== STEPPER =====
+function goStep(n) {
+  document.querySelectorAll('.section').forEach((s, i) => {
+    s.classList.toggle('active', i === n);
+  });
+  document.querySelectorAll('.step').forEach((s, i) => {
+    s.classList.remove('active', 'done');
+    if (i < n) s.classList.add('done');
+    if (i === n) s.classList.add('active');
+  });
+  state.currentStep = n;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ===== PILL SELECT =====
+function setPill(el, group) {
+  document.querySelectorAll(`#${group} .pill`).forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  if (group === 'buildType') state.buildType = el.dataset.val;
+  if (group === 'splashStyle') { state.splashStyle = el.dataset.val; updateSplashPreview(); }
+}
+
+function togglePill(el) {
+  el.classList.toggle('active');
+}
+
+// ===== PASSWORD TOGGLE =====
+function togglePass(id, btn) {
+  const inp = document.getElementById(id);
+  const isPass = inp.type === 'password';
+  inp.type = isPass ? 'text' : 'password';
+  btn.textContent = isPass ? '🙈' : '👁️';
+}
+
+// ===== GITHUB VALIDATION =====
+function validateGH() {
+  const user = document.getElementById('ghUser').value.trim();
+  const token = document.getElementById('ghToken').value.trim();
+  const repo = document.getElementById('ghRepo').value.trim();
+  const valid = user && token && repo;
+  document.getElementById('btnTestGH').disabled = !valid;
+  document.getElementById('btnStep1Next').disabled = !valid;
+}
+
+function sanitizeRepo() {
+  const el = document.getElementById('ghRepo');
+  el.value = el.value.toLowerCase().replace(/[^a-z0-9-]/g, '-').replace(/--+/g, '-');
+  validateGH();
+}
+
+async function testGitHub() {
+  const user = document.getElementById('ghUser').value.trim();
+  const token = document.getElementById('ghToken').value.trim();
+  const btn = document.getElementById('btnTestGH');
+  const status = document.getElementById('ghStatus');
+
+  btn.disabled = true;
+  btn.textContent = '⏳ Testing...';
+  status.textContent = '';
 
   try {
-    const res = await fetch(API, {
-      method: 'POST',
+    const res = await fetch(`https://api.github.com/user`, {
       headers: {
-        'Content-Type':  'application/json',
-        'Authorization': 'Bearer ' + key,
-        'HTTP-Referer':  'https://buildai.app',
-        'X-Title':       'BuildAI',
-      },
-      body: JSON.stringify({
-        model,
-        max_tokens:  8192,
-        temperature: 0.85,
-        messages: [
-          { role:'system', content:SYS },
-          { role:'user',   content:'Build a stunning, complete website for:\n\n'+p+'\n\nFollow all system prompt instructions exactly. Output ONLY the complete HTML file.' }
-        ]
-      })
-    });
-
-    if (!res.ok) {
-      let msg='';
-      try { const b=await res.json(); msg=b?.error?.message||''; } catch(_){}
-      if (/401|unauthorized|invalid.*key/i.test(msg||res.status)) {
-        throw new Error('INVALID_KEY');
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/vnd.github+json',
+        'X-GitHub-Api-Version': '2022-11-28'
       }
-      if (res.status===429) throw new Error('RATE_LIMIT');
-      throw new Error('HTTP '+res.status+(msg?' — '+msg:''));
-    }
-
+    });
     const data = await res.json();
-    let text = (data?.choices?.[0]?.message?.content||'').trim();
-    text = text.replace(/^```html\s*/im,'').replace(/^```\s*/im,'').replace(/```\s*$/m,'').trim();
-    if (!text.match(/<!doctype|<html/i)) {
-      const m2 = text.match(/<!DOCTYPE[\s\S]*<\/html>/i)||text.match(/<html[\s\S]*<\/html>/i);
-      if (m2) text=m2[0]; else throw new Error('non-HTML response from model');
+    if (res.ok && data.login) {
+      status.innerHTML = `<span style="color:var(--success)">✅ Connected as ${data.login}</span>`;
+    } else {
+      status.innerHTML = `<span style="color:var(--danger)">❌ ${data.message || 'Invalid token'}</span>`;
     }
+  } catch (e) {
+    status.innerHTML = `<span style="color:var(--danger)">❌ Network error</span>`;
+  }
 
-    // Success
-    const usedModel = data?.model || model;
-    const badge = usedModel.split('/').pop().replace(':free','');
-    document.getElementById('mdlBadge').textContent = badge+' · free';
+  btn.disabled = false;
+  btn.textContent = '🔗 Test Connection';
+}
 
-    curHTML = injectPreloader(text);
-    hideProg(true);
-    renderPreview(curHTML);
-    pushGallery(p, curHTML);
-    pushHist(p, curHTML);
-    document.getElementById('dlBtn').disabled = false;
-    document.getElementById('mobDl').disabled = false;
-    document.getElementById('urlBar').textContent = slug(p)+'.html';
-    setStatus('✓ Website generated with '+badge+'!', 'ok');
+// ===== FILE UPLOAD =====
+function previewFile(inputId, previewId) {
+  const file = document.getElementById(inputId).files[0];
+  if (!file) return;
+  const preview = document.getElementById(previewId);
+  const isImg = file.type.startsWith('image/');
+  let inner = `<div class="file-preview">`;
+  if (isImg) {
+    const url = URL.createObjectURL(file);
+    inner += `<img src="${url}" class="file-preview-img" alt="icon">`;
+    if (inputId === 'iconFile') {
+      document.getElementById('splashPhone').style.background = document.getElementById('splashBg').value;
+      document.getElementById('splashIconPreview').innerHTML = `<img src="${url}" style="width:48px;height:48px;border-radius:14px;object-fit:cover">`;
+    }
+  } else {
+    inner += `<div class="file-preview-icon">📄</div>`;
+  }
+  inner += `<div class="file-preview-info">
+    <div class="file-preview-name">${file.name}</div>
+    <div class="file-preview-size">${formatBytes(file.size)}</div>
+  </div>
+  <button class="file-preview-remove" onclick="clearFile('${inputId}','${previewId}')">✕</button>
+  </div>`;
+  preview.innerHTML = inner;
+  preview.style.display = 'block';
+}
 
-    // Start cooldown AFTER success
-    startCooldown();
-
-  } catch(err) {
-    hideProg(false);
-    setGenBtnsDisabled(false);
-    const msg = err.message||'';
-    if (msg==='INVALID_KEY')  setStatus('✕ Invalid API key — check your OpenRouter key.', 'err');
-    else if (msg==='RATE_LIMIT') { setStatus('✕ Rate limit hit — try another model or wait a moment.', 'err'); startCooldown(); }
-    else setStatus('✕ '+msg, 'err');
+function clearFile(inputId, previewId) {
+  document.getElementById(inputId).value = '';
+  document.getElementById(previewId).style.display = 'none';
+  document.getElementById(previewId).innerHTML = '';
+  if (inputId === 'iconFile') {
+    document.getElementById('splashIconPreview').textContent = '📦';
   }
 }
 
-/* ══ MOBILE GENERATE ══ */
-function generateMobile() {
-  const p=document.getElementById('mobP').value.trim();
-  const k=document.getElementById('mobKey').value.trim();
-  if (p) document.getElementById('prompt').value=p;
-  if (k) document.getElementById('apiKey').value=k;
-  closeSheet();
-  generate();
+function dragOver(e, dropId) {
+  e.preventDefault();
+  document.getElementById(dropId).classList.add('drag');
+}
+function dragLeave(dropId) {
+  document.getElementById(dropId).classList.remove('drag');
+}
+function dropFile(e, inputId, dropId, previewId) {
+  e.preventDefault();
+  dragLeave(dropId);
+  const file = e.dataTransfer.files[0];
+  if (!file) return;
+  const dt = new DataTransfer();
+  dt.items.add(file);
+  document.getElementById(inputId).files = dt.files;
+  previewFile(inputId, previewId);
 }
 
-/* ══ PRELOADER INJECT ══ */
-function injectPreloader(h) {
-  if (/preloader/i.test(h)) return h;
-  const css=`.preloader{position:fixed;top:0;left:0;width:100%;height:100%;background:var(--bg,#000);display:flex;align-items:center;justify-content:center;gap:0;z-index:9999;transition:opacity .5s ease,visibility .5s ease}.preloader.hidden{opacity:0;visibility:hidden;pointer-events:none}.preloader span{display:block;height:15px;width:15px;background:#19e3d5;margin:0 7px;border-radius:10px;animation:preUp 1.2s infinite}.preloader span:nth-child(1){animation-delay:.15s}.preloader span:nth-child(2){animation-delay:.3s}.preloader span:nth-child(3){animation-delay:.45s}.preloader span:nth-child(4){animation-delay:.6s}.preloader span:nth-child(5){animation-delay:.75s}@keyframes preUp{0%{height:15px;background:#19e3d5}50%{height:60px;background:#d33deb}100%{height:15px;background:#f00e43}}`;
-  const html=`<div class="preloader" id="buildai-preloader"><span></span><span></span><span></span><span></span><span></span></div>`;
-  const js  =`<script>window.addEventListener('load',function(){setTimeout(function(){var p=document.getElementById('buildai-preloader');if(p)p.classList.add('hidden');},300);});<\/script>`;
-  if (h.includes('</style>')) h=h.replace('</style>',css+'</style>');
-  else if (h.includes('</head>')) h=h.replace('</head>','<style>'+css+'</style></head>');
-  h=h.replace(/<body([^>]*)>/i,'<body$1>'+html);
-  h=h.replace('</body>',js+'</body>');
-  return h;
+function formatBytes(b) {
+  if (b < 1024) return b + ' B';
+  if (b < 1048576) return (b / 1024).toFixed(1) + ' KB';
+  return (b / 1048576).toFixed(1) + ' MB';
 }
 
-/* ══ RENDER ══ */
-function renderPreview(h) {
-  document.getElementById('emptyEl').style.display='none';
-  const f=document.getElementById('frame');
-  f.srcdoc=h;
-  f.classList.toggle('hidden', curTab!=='preview');
-  document.getElementById('codePre').textContent=h;
-  document.getElementById('codeEl').classList.toggle('hidden', curTab!=='code');
+// ===== HTML MODE =====
+function toggleHtmlMode(mode) {
+  state.htmlMode = mode;
+  document.getElementById('htmlModeUpload').style.display = mode === 'upload' ? 'block' : 'none';
+  document.getElementById('htmlModePaste').style.display = mode === 'paste' ? 'block' : 'none';
+  document.getElementById('htmlModeUrl').style.display = mode === 'url' ? 'block' : 'none';
 }
 
-/* ══ GALLERY ══ */
-function pushGallery(p,h) {
-  gallery.unshift({p,h,ts:Date.now()});
-  if (gallery.length>20) gallery.pop();
-  document.getElementById('gCount').textContent=gallery.length+' site'+(gallery.length!==1?'s':'');
-  if (curTab==='gallery') renderGallery();
-}
-function renderGallery() {
-  const grid=document.getElementById('gGrid'), empty=document.getElementById('gEmpty');
-  empty.style.display=gallery.length?'none':'flex';
-  grid.innerHTML='';
-  gallery.forEach((item,i)=>{
-    const c=document.createElement('div');
-    c.className='gcard a-fade'; c.style.animationDelay=(i*35)+'ms';
-    c.innerHTML=`<div class="gthumb"><iframe srcdoc="${esc(item.h)}" sandbox="allow-scripts allow-same-origin"></iframe><div class="gover"><div class="flex items-center gap-2 rounded-xl px-3 py-1.5 border border-white/10" style="background:rgba(0,0,0,.7)"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><span class="font-mono text-w" style="font-size:9.5px">Preview</span></div></div></div><div class="flex items-center justify-between gap-2 p-2.5"><p class="font-mono text-s truncate" style="font-size:9.5px">${esc(item.p)}</p><button onclick="event.stopPropagation();dlSpec(${i})" class="dlb flex-shrink-0" style="width:auto;padding:3px 8px;font-size:9px"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button></div>`;
-    c.querySelector('.gthumb').onclick=()=>openModal(item);
-    grid.appendChild(c);
-  });
-}
-function esc(s){return s.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+// ===== SPLASH PREVIEW =====
+function updateSplashPreview() {
+  const phone = document.getElementById('splashPhone');
+  const nameEl = document.getElementById('splashNamePreview');
+  const bg = document.getElementById('splashBg').value;
+  const accent = document.getElementById('splashAccent').value;
+  const appName = document.getElementById('appName') ? document.getElementById('appName').value : '';
 
-/* ══ MODAL ══ */
-function openModal(item){modalHTML=item.h;document.getElementById('mTitle').textContent=item.p;document.getElementById('mFrame').srcdoc=item.h;document.getElementById('modal').classList.remove('hidden');}
-function closeModal(){document.getElementById('modal').classList.add('hidden');document.getElementById('mFrame').srcdoc='';}
-function dlModal(){dlHTML(modalHTML,'website');}
+  phone.style.background = bg;
+  if (state.splashStyle === 'gradient') {
+    phone.style.background = `linear-gradient(135deg, ${bg}, ${accent}33)`;
+  }
 
-/* ══ DOWNLOAD ══ */
-function dlFile()    {dlHTML(curHTML,document.getElementById('prompt').value);}
-function dlSpec(i)   {dlHTML(gallery[i].h,gallery[i].p);}
-function dlHTML(h,n) {
-  if (!h) return;
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob([h],{type:'text/html'}));
-  a.download=(slug(n)||'website')+'.html';
-  a.click(); URL.revokeObjectURL(a.href);
+  nameEl.textContent = appName || 'App Name';
+  nameEl.style.color = accent;
+  phone.querySelector('.splash-phone-bar-fill').style.background = `linear-gradient(90deg, ${accent}, ${accent}88)`;
 }
 
-/* ══ HISTORY ══ */
-function pushHist(p,h) {
-  hist.unshift({p,h}); if(hist.length>12) hist.pop();
-  ['histD','histM'].forEach(id=>{
-    const w=document.getElementById(id); if(!w) return;
-    w.innerHTML='';
-    hist.forEach((item,i)=>{
-      const el=document.createElement('div');
-      el.className='hit'+(i===0?' on':''); el.textContent=item.p;
-      el.onclick=()=>{curHTML=item.h;renderPreview(item.h);document.getElementById('dlBtn').disabled=false;document.getElementById('mobDl').disabled=false;document.getElementById('urlBar').textContent=slug(item.p)+'.html';document.querySelectorAll('.hit').forEach((e,j)=>e.classList.toggle('on',j===i));closeSheet();};
-      w.appendChild(el);
+// ===== FONT PICKER =====
+function setFont(el) {
+  document.querySelectorAll('.font-opt').forEach(f => f.classList.remove('active'));
+  el.classList.add('active');
+  state.font = el.dataset.font;
+}
+
+// ===== TOGGLE CARD =====
+function toggleCard(bodyId, checkbox) {
+  const body = document.getElementById(bodyId);
+  if (!body) return;
+  body.style.display = checkbox.checked ? 'block' : 'none';
+  // Also dim the card title visually
+  const card = body.closest('.card');
+  if (card) card.style.opacity = checkbox.checked ? '1' : '0.55';
+}
+
+// ===== RATIO =====
+function setRatio(el) {
+  document.querySelectorAll('.ratio-opt').forEach(r => r.classList.remove('active'));
+  el.classList.add('active');
+  state.ratio = el.dataset.val;
+}
+
+// Device detection
+function detectDevice() {
+  const ua = navigator.userAgent;
+  const badge = document.getElementById('deviceBadge');
+  if (/Mobi|Android/i.test(ua)) {
+    badge.textContent = '📱 Mobile detected → Portrait recommended';
+    document.querySelector('[data-val="portrait"]').classList.add('auto-detected');
+  } else if (/Tablet|iPad/i.test(ua)) {
+    badge.textContent = '📟 Tablet detected → Landscape recommended';
+    document.querySelector('[data-val="landscape"]').classList.add('auto-detected');
+  } else {
+    badge.textContent = '💻 Desktop detected → Adaptive recommended';
+    document.querySelector('[data-val="adaptive"]').classList.add('auto-detected');
+  }
+}
+detectDevice();
+
+// ===== COLOR HELPER =====
+function setColor(id, val) {
+  document.getElementById(id).value = val;
+  updateSplashPreview();
+}
+
+// ===== BUILD PROCESS =====
+const buildSteps = [
+  { pct: 5, msg: '🔍 Validating configuration...', type: 'info' },
+  { pct: 12, msg: '📦 Creating GitHub repository...', type: 'info' },
+  { pct: 20, msg: '✅ Repository created successfully.', type: 'ok' },
+  { pct: 28, msg: '📝 Generating Capacitor config...', type: 'info' },
+  { pct: 35, msg: '🎨 Embedding splash screen & theme...', type: 'info' },
+  { pct: 42, msg: '🔤 Injecting font: ' + (state.font || 'Syne') + '...', type: 'info' },
+  { pct: 50, msg: '📤 Pushing files to repository...', type: 'info' },
+  { pct: 57, msg: '✅ Files pushed. Triggering GitHub Actions...', type: 'ok' },
+  { pct: 63, msg: '⚙️ GitHub Actions: Setting up environment...', type: 'info' },
+  { pct: 70, msg: '⚙️ Installing Node.js & Capacitor...', type: 'info' },
+  { pct: 76, msg: '⚙️ Setting up Java 17 & Android SDK...', type: 'info' },
+  { pct: 83, msg: '🔨 Running Gradle build...', type: 'info' },
+  { pct: 90, msg: '✅ Gradle build complete.', type: 'ok' },
+  { pct: 95, msg: '📦 Packaging artifact...', type: 'info' },
+  { pct: 100, msg: '🎉 Build complete! Artifact ready.', type: 'ok' },
+];
+
+const statusLabels = [
+  'Validating config...', 'Creating repo...', 'Pushing files...', 
+  'Triggering Actions...', 'Building APK...', 'Almost done...', 'Complete!'
+];
+
+function addLog(msg, type = 'info') {
+  const log = document.getElementById('buildLog');
+  const now = new Date();
+  const time = `${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+  const div = document.createElement('div');
+  div.className = 'log-entry';
+  div.innerHTML = `<span class="log-time">${time}</span><span class="log-${type}">${msg}</span>`;
+  log.appendChild(div);
+  log.scrollTop = log.scrollHeight;
+}
+
+function setProgress(pct, label) {
+  document.getElementById('buildProgress').style.width = pct + '%';
+  document.getElementById('buildPercent').textContent = pct + '%';
+  if (label) document.getElementById('buildStatusText').textContent = label;
+}
+
+async function startBuild() {
+  // Reset
+  document.getElementById('buildLog').innerHTML = '';
+  document.getElementById('resultCard').classList.remove('show');
+  document.getElementById('errorCard').style.display = 'none';
+  setProgress(0, 'Initializing...');
+  state.buildPhase = 0;
+
+  const user = document.getElementById('ghUser').value.trim();
+  const token = document.getElementById('ghToken').value.trim();
+  const repo = document.getElementById('ghRepo').value.trim();
+  const appName = document.getElementById('appName').value.trim() || 'MyApp';
+  const appPkg = document.getElementById('appPackage').value.trim() || 'com.example.myapp';
+  const appVer = document.getElementById('appVersion').value.trim() || '1.0.0';
+  const appVerCode = document.getElementById('appVersionCode').value || '1';
+  const minApi = document.getElementById('minApi').value;
+  const targetApi = document.getElementById('targetApi').value;
+  const visibility = document.getElementById('ghVisibility').value;
+  const buildType = state.buildType;
+  const font = state.font;
+  const ratio = state.ratio;
+  const splashBg = document.getElementById('splashBg').value;
+  const splashAccent = document.getElementById('splashAccent').value;
+  const splashDuration = document.getElementById('splashDuration').value;
+
+  // Get HTML content
+  let htmlContent = '';
+  if (state.htmlMode === 'paste') {
+    htmlContent = document.getElementById('htmlCode').value || getDefaultHTML(appName, font, splashBg, splashAccent);
+  } else if (state.htmlMode === 'url') {
+    htmlContent = getUrlHTML(document.getElementById('htmlUrl').value);
+  } else {
+    const htmlFile = document.getElementById('htmlFile').files[0];
+    if (htmlFile && htmlFile.name.endsWith('.html')) {
+      htmlContent = await htmlFile.text();
+    } else {
+      htmlContent = getDefaultHTML(appName, font, splashBg, splashAccent);
+    }
+  }
+
+  // Simulate + real GitHub API calls
+  addLog('🚀 Starting APK build for "' + appName + '"', 'info');
+  addLog('📋 Build type: ' + buildType.toUpperCase(), 'info');
+
+  try {
+    // ── Step 1: Ensure repo exists and is accessible
+    setProgress(8, 'Menyiapkan repository...');
+
+    // First, check if repo already exists
+    const repoCheckRes = await fetch(`https://api.github.com/repos/${user}/${repo}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/vnd.github+json',
+        'X-GitHub-Api-Version': '2022-11-28'
+      }
     });
-  });
-  document.getElementById('histEmptyD').style.display='none';
-  document.getElementById('histEmptyM').style.display='none';
+
+    let defaultBranch = 'main';
+
+    if (repoCheckRes.ok) {
+      const repoInfo = await repoCheckRes.json();
+      defaultBranch = repoInfo.default_branch || 'main';
+      addLog(`✅ Repo sudah ada (branch: ${defaultBranch}). Lanjut pakai existing.`, 'ok');
+    } else {
+      // Create new repo
+      addLog('📦 Membuat repository baru: ' + repo, 'info');
+      const createRes = await fetch(`https://api.github.com/user/repos`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/vnd.github+json',
+          'Content-Type': 'application/json',
+          'X-GitHub-Api-Version': '2022-11-28'
+        },
+        body: JSON.stringify({
+          name: repo,
+          private: visibility === 'private',
+          auto_init: true,
+          description: `${appName} - Built with APK Builder`
+        })
+      });
+      const createData = await createRes.json();
+      if (!createRes.ok) throw new Error('Gagal buat repo: ' + (createData.message || createRes.status));
+      defaultBranch = createData.default_branch || 'main';
+      addLog('✅ Repository dibuat! Branch: ' + defaultBranch, 'ok');
+
+      // Wait for GitHub to fully initialize the repo
+      setProgress(12, 'Menunggu repo init...');
+      addLog('⏳ Menunggu GitHub selesai init repo...', 'info');
+      await sleep(4000);
+
+      // Poll until the repo's contents API is accessible
+      for (let i = 0; i < 10; i++) {
+        const poll = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/`, {
+          headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' }
+        });
+        if (poll.ok) { addLog('✅ Repo siap!', 'ok'); break; }
+        if (i === 9) throw new Error('Repo timeout. Coba lagi.');
+        await sleep(2000);
+      }
+    }
+
+    setProgress(20, 'Pushing files...');
+
+    // Push all files with [skip ci] — then dispatch workflow ONCE
+    const designEnabled = {
+      splash: document.getElementById('toggleSplash')?.checked !== false,
+      font:   document.getElementById('toggleFont')?.checked !== false,
+      ratio:  document.getElementById('toggleRatio')?.checked !== false,
+    };
+
+    addLog('📝 Generating workflow...', 'info');
+    const workflowContent = generateWorkflow(buildType, appName, appPkg, appVer, appVerCode, minApi, targetApi, font, ratio, splashBg, splashAccent, splashDuration, designEnabled);
+    const workflowB64 = btoa(unescape(encodeURIComponent(workflowContent)));
+    await pushFile(user, repo, token, '.github/workflows/build.yml', workflowB64, '🤖 Add build workflow [skip ci]');
+    addLog('✅ Workflow file pushed.', 'ok');
+    setProgress(30, 'Pushing HTML...');
+
+    const htmlB64 = btoa(unescape(encodeURIComponent(htmlContent)));
+    await pushFile(user, repo, token, 'www/index.html', htmlB64, '📄 Add app HTML [skip ci]');
+    addLog('✅ HTML pushed.', 'ok');
+    setProgress(42, 'All files ready. Triggering build...');
+    await sleep(800);
+
+    // Step 4: Trigger workflow dispatch
+    const dispatchRes = await fetch(`https://api.github.com/repos/${user}/${repo}/actions/workflows/build.yml/dispatches`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/vnd.github+json',
+        'Content-Type': 'application/json',
+        'X-GitHub-Api-Version': '2022-11-28'
+      },
+      body: JSON.stringify({ ref: defaultBranch })
+    });
+
+    addLog('✅ GitHub Actions triggered! Build started.', 'ok');
+    setProgress(52, 'Waiting for runner...');
+
+    const ghLink = `https://github.com/${user}/${repo}/actions`;
+    state.ghLink = ghLink;
+    document.getElementById('buildGHLink').href = ghLink;
+    document.getElementById('buildGHLink').style.display = 'inline';
+
+    // Poll for the workflow run — wait a bit for GH to register the dispatch
+    addLog('⏳ Waiting for GitHub to queue the job...', 'info');
+    await sleep(6000);
+
+    const dispatchTime = Date.now();
+    let runId = null;
+    for (let i = 0; i < 12; i++) {
+      const runsRes = await fetch(`https://api.github.com/repos/${user}/${repo}/actions/runs?per_page=10&event=workflow_dispatch`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/vnd.github+json',
+          'X-GitHub-Api-Version': '2022-11-28'
+        }
+      });
+      const runsData = await runsRes.json();
+      // Find a run created after we dispatched (within last 2 min)
+      const recent = (runsData.workflow_runs || []).find(r => {
+        const created = new Date(r.created_at).getTime();
+        return created >= dispatchTime - 10000; // 10s buffer
+      });
+      if (recent) {
+        runId = recent.id;
+        state.runId = runId;
+        document.getElementById('buildJobId').textContent = `Run ID: ${runId}`;
+        addLog('🔍 Run ID: ' + runId, 'info');
+        break;
+      }
+      addLog(`⏳ Waiting for runner... (${i+1}/12)`, 'info');
+      await sleep(4000);
+    }
+
+    if (!runId) {
+      throw new Error('Timeout menunggu runner. Cek manual di: ' + ghLink);
+    }
+
+    setProgress(65, 'Building APK...');
+    addLog('⚙️ Build in progress on GitHub runner...', 'info');
+
+    // Step 6: Poll build status
+    let complete = false;
+    let polls = 0;
+    const maxPolls = 60; // 5 min max
+    const fakeMessages = [
+      'Installing Node.js & dependencies...',
+      'Setting up Java 17...',
+      'Installing Android SDK...',
+      'Running: npm install @capacitor/core @capacitor/cli...',
+      'Running: npx cap init...',
+      'Running: npx cap add android...',
+      'Running: npx cap sync...',
+      'Running: ./gradlew assembleDebug...',
+      'Compiling Kotlin sources...',
+      'Merging resources...',
+      'Packaging APK...',
+    ];
+    let fakeIdx = 0;
+
+    while (!complete && polls < maxPolls) {
+      await sleep(5000);
+      polls++;
+
+      if (fakeIdx < fakeMessages.length && polls % 2 === 0) {
+        addLog('⚙️ ' + fakeMessages[fakeIdx++], 'info');
+      }
+
+      const statusRes = await fetch(`https://api.github.com/repos/${user}/${repo}/actions/runs/${runId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/vnd.github+json',
+          'X-GitHub-Api-Version': '2022-11-28'
+        }
+      });
+      const statusData = await statusRes.json();
+      const status = statusData.status;
+      const conclusion = statusData.conclusion;
+
+      const pct = Math.min(65 + (polls / maxPolls) * 30, 94);
+      setProgress(Math.round(pct), 'Building...');
+
+      if (status === 'completed') {
+        complete = true;
+        if (conclusion === 'success') {
+          setProgress(98, 'Fetching artifact...');
+          addLog('✅ Build completed successfully!', 'ok');
+
+          // Get artifacts
+          await sleep(2000);
+          const artRes = await fetch(`https://api.github.com/repos/${user}/${repo}/actions/runs/${runId}/artifacts`, {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Accept': 'application/vnd.github+json',
+              'X-GitHub-Api-Version': '2022-11-28'
+            }
+          });
+          const artData = await artRes.json();
+
+          setProgress(100, 'Done!');
+          addLog('🎉 APK ready for download!', 'ok');
+
+          // Show result
+          const apkArt = artData.artifacts?.find(a => a.name.includes('apk') || a.name.includes('debug'));
+          const aabArt = artData.artifacts?.find(a => a.name.includes('aab') || a.name.includes('release'));
+          
+          const dlAPK = document.getElementById('dlAPK');
+          const dlAAB = document.getElementById('dlAAB');
+
+          if (apkArt) {
+            dlAPK.href = `https://github.com/${user}/${repo}/actions/runs/${runId}/artifacts/${apkArt.id}`;
+            dlAPK.textContent = `⬇️ Download APK (${formatBytes(apkArt.size_in_bytes)})`;
+          } else {
+            dlAPK.href = ghLink;
+            dlAPK.textContent = '🔗 View on GitHub Actions';
+          }
+
+          if (buildType === 'aab' && aabArt) {
+            dlAAB.href = `https://github.com/${user}/${repo}/actions/runs/${runId}/artifacts/${aabArt.id}`;
+            dlAAB.style.display = 'inline-flex';
+          }
+
+          document.getElementById('resultDesc').textContent = `"${appName}" berhasil dibuild. Artifact tersimpan 90 hari di GitHub Actions.`;
+          document.getElementById('resultCard').classList.add('show');
+
+        } else {
+          throw new Error(`Build failed with conclusion: ${conclusion}. Check logs at ${ghLink}`);
+        }
+      }
+    }
+
+    if (!complete) {
+      addLog('⏰ Timeout reached. Build masih berjalan — cek di GitHub Actions.', 'warn');
+      setProgress(90, 'Still running...');
+      document.getElementById('buildGHLink').textContent = '🔗 Cek Build di GitHub Actions (masih berjalan)';
+    }
+
+  } catch (err) {
+    addLog('❌ Error: ' + err.message, 'err');
+    setProgress(0, 'Failed');
+    document.getElementById('errorCard').style.display = 'block';
+    document.getElementById('errorDesc').innerHTML = `
+      <strong>${err.message}</strong><br><br>
+      ${state.ghLink ? `<a href="${state.ghLink}" target="_blank" style="color:var(--accent)">Lihat detail di GitHub Actions →</a>` : ''}
+    `;
+  }
 }
 
-/* ══ STATUS ══ */
-let stT;
-function setStatus(msg,type){
-  ['statusD','statusM'].forEach(id=>{const el=document.getElementById(id);if(!el)return;el.textContent=msg;el.style.color=type==='err'?'#ef4444':type==='ok'?'#00ff88':type==='warn'?'#f59e0b':'#444';});
-  clearTimeout(stT);
-  if(type==='ok') stT=setTimeout(()=>['statusD','statusM'].forEach(id=>{const e=document.getElementById(id);if(e){e.textContent='';e.style.color='#444';}}),5000);
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+async function pushFile(user, repo, token, path, contentB64, message, retries = 4) {
+  for (let attempt = 0; attempt < retries; attempt++) {
+    try {
+      // Get SHA if file already exists
+      let sha;
+      const check = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/${path}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/vnd.github+json',
+          'X-GitHub-Api-Version': '2022-11-28'
+        }
+      });
+      if (check.ok) {
+        const d = await check.json();
+        sha = d.sha;
+      }
+
+      const body = { message, content: contentB64 };
+      if (sha) body.sha = sha;
+
+      const res = await fetch(`https://api.github.com/repos/${user}/${repo}/contents/${path}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/vnd.github+json',
+          'Content-Type': 'application/json',
+          'X-GitHub-Api-Version': '2022-11-28'
+        },
+        body: JSON.stringify(body)
+      });
+
+      if (res.ok) return res.json();
+
+      const d = await res.json();
+      // If Not Found (404) or conflict (409), wait and retry
+      if ((res.status === 404 || res.status === 409) && attempt < retries - 1) {
+        await sleep(3000 + attempt * 1000);
+        continue;
+      }
+      throw new Error(`Failed to push ${path}: ${d.message} (HTTP ${res.status})`);
+    } catch(e) {
+      if (attempt < retries - 1) {
+        await sleep(2000 + attempt * 1000);
+        continue;
+      }
+      throw e;
+    }
+  }
 }
 
-/* ══ MOBILE SHEET ══ */
-function openSheet(){const k=document.getElementById('apiKey').value;if(k)document.getElementById('mobKey').value=k;document.getElementById('mSheet').style.display='block';requestAnimationFrame(()=>document.getElementById('msPanel').classList.add('open'));}
-function closeSheet(){document.getElementById('msPanel').classList.remove('open');setTimeout(()=>{document.getElementById('mSheet').style.display='none';},360);}
+// ===== GENERATE WORKFLOW =====
+function generateWorkflow(buildType, appName, appPkg, appVer, appVerCode, minApi, targetApi, font, ratio, splashBg, splashAccent, splashDuration, designEnabled) {
+  const isAAB = buildType === 'aab';
+  const isRelease = buildType === 'release' || isAAB;
+  const gradleCmd = isAAB ? './gradlew bundleRelease' : (isRelease ? './gradlew assembleRelease' : './gradlew assembleDebug');
+  const artifactPath = isAAB
+    ? 'android/app/build/outputs/bundle/release/app-release.aab'
+    : (isRelease ? 'android/app/build/outputs/apk/release/app-release.apk' : 'android/app/build/outputs/apk/debug/app-debug.apk');
+  const artifactName = isAAB ? 'app-aab' : (isRelease ? 'app-release' : 'app-debug');
+  const orientation = ratio === 'portrait' ? 'portrait' : (ratio === 'landscape' ? 'sensorLandscape' : 'unspecified');
+  const safeAppName = appName.replace(/['"\\]/g, '');
+  const safeAppPkg  = appPkg.replace(/['"\\]/g, '');
 
-/* ══ DEVICE DETECT ══ */
-function detectDevice(){
-  const ua=navigator.userAgent,vw=window.innerWidth,sw=window.screen.width,sh=window.screen.height,dpr=window.devicePixelRatio||1;
-  let os='Unknown',osS='Unknown';
-  if(/iPhone/.test(ua)){os='🍎 iOS (iPhone)';osS='iOS';}else if(/iPad/.test(ua)){os='🍎 iPadOS';osS='iPadOS';}else if(/Android/.test(ua)){os='🤖 Android';osS='Android';}else if(/Mac OS X/.test(ua)){os='🍎 macOS';osS='macOS';}else if(/Windows NT 10/.test(ua)){os='🪟 Windows 11';osS='Win11';}else if(/Windows NT 6/.test(ua)){os='🪟 Windows 8/10';osS='Windows';}else if(/Windows/.test(ua)){os='🪟 Windows';osS='Windows';}else if(/CrOS/.test(ua)){os='🌐 ChromeOS';osS='ChromeOS';}else if(/Linux/.test(ua)){os='🐧 Linux';osS='Linux';}
-  let type='Desktop';
-  if(/Mobi|Android|iPhone/.test(ua)&&vw<768)type='Mobile';else if(/iPad/.test(ua)||(vw>=768&&vw<1100&&/Android/.test(ua)))type='Tablet';
-  let br='Unknown';
-  if(/Edg\//.test(ua))br='Edge';else if(/OPR\//.test(ua))br='Opera';else if(/Chrome\//.test(ua))br='Chrome';else if(/Firefox\//.test(ua))br='Firefox';else if(/Safari\//.test(ua))br='Safari';
-  const display=dpr>=2?`Retina (${dpr}x)`:`Standard (${dpr}x)`;
-  const network=navigator.connection?(navigator.connection.effectiveType||'').toUpperCase()||'—':'—';
-  const hb=document.getElementById('devBadge'); if(hb)hb.textContent=`${osS} · ${type} · ${br}${dpr>=2?' · Retina':''}`;
-  const mb=document.getElementById('devBadgeMob'); if(mb)mb.textContent=`${osS} · ${type}`;
-  const s=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
-  s('dOS',os);s('dType',type+` (${vw}px)`);s('dBr',br);s('dScr',`${sw}×${sh}`);s('dDis',display);s('dNet',network);
+  const fontStep = designEnabled.font ? `
+      - name: Inject custom font
+        run: |
+          sed -i "s|</head>|<link href='https://fonts.googleapis.com/css2?family=${font.replace(/ /g,'+')}:wght@400;600;700\\&display=swap' rel='stylesheet'><style>body,*{font-family:'${font}',sans-serif!important}</style></head>|g" www/index.html || true
+` : '';
+
+  const orientStep = designEnabled.ratio && ratio !== 'adaptive' ? `
+      - name: Set screen orientation
+        run: |
+          MANIFEST="android/app/src/main/AndroidManifest.xml"
+          if grep -q 'screenOrientation' "$MANIFEST"; then
+            sed -i 's/android:screenOrientation="[^"]*"/android:screenOrientation="${orientation}"/g' "$MANIFEST"
+          else
+            sed -i 's/android:name=".MainActivity"/android:name=".MainActivity" android:screenOrientation="${orientation}"/g' "$MANIFEST"
+          fi
+` : '';
+
+  return `name: Build Android APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Create package.json
+        run: |
+          cat > package.json << 'PKGJSON'
+          {
+            "name": "app",
+            "version": "1.0.0",
+            "description": "",
+            "main": "index.js",
+            "scripts": {},
+            "keywords": [],
+            "author": "",
+            "license": "ISC"
+          }
+          PKGJSON
+
+      - name: Install Capacitor v7
+        run: |
+          npm install --save @capacitor/core@7.0.0 @capacitor/android@7.0.0
+          npm install --save-dev @capacitor/cli@7.0.0
+
+      - name: Create capacitor.config.json
+        run: |
+          cat > capacitor.config.json << 'CAPCONF'
+          {
+            "appId": "${safeAppPkg}",
+            "appName": "${safeAppName}",
+            "webDir": "www",
+            "server": {
+              "androidScheme": "https"
+            }
+          }
+          CAPCONF
+
+      - name: Add Android platform
+        run: npx cap add android
+
+      - name: Verify android folder exists
+        run: |
+          ls android/app/build.gradle || (echo "ERROR: android folder not created!" && exit 1)
+
+      - name: Patch build.gradle
+        run: |
+          GRADLE="android/app/build.gradle"
+          echo "--- Before patch ---"
+          grep -E "versionCode|versionName|minSdk|targetSdk|compileSdk" "$GRADLE" || true
+          sed -i "s/versionCode [0-9]\\+/versionCode ${appVerCode}/g" "$GRADLE"
+          sed -i "s/versionCode [0-9]*/versionCode ${appVerCode}/g" "$GRADLE"
+          sed -i 's/versionName \\"[^\\"]*\\"/versionName \\"${appVer}\\"/g' "$GRADLE"
+          sed -i "s/minSdk [0-9]\\+/minSdk ${minApi}/g" "$GRADLE"
+          sed -i "s/minSdk [0-9]*/minSdk ${minApi}/g" "$GRADLE"
+          sed -i "s/targetSdk [0-9]\\+/targetSdk ${targetApi}/g" "$GRADLE"
+          sed -i "s/targetSdk [0-9]*/targetSdk ${targetApi}/g" "$GRADLE"
+          sed -i "s/compileSdk [0-9]\\+/compileSdk ${targetApi}/g" "$GRADLE"
+          sed -i "s/compileSdk [0-9]*/compileSdk ${targetApi}/g" "$GRADLE"
+          echo "--- After patch ---"
+          grep -E "versionCode|versionName|minSdk|targetSdk|compileSdk" "$GRADLE" || true
+${fontStep}${orientStep}
+      - name: Sync Capacitor
+        run: npx cap sync android
+
+      - name: Build ${buildType.toUpperCase()}
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew ${gradleCmd.replace('./gradlew ','')} --stacktrace
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${artifactName}
+          path: ${artifactPath}
+          retention-days: 90
+          if-no-files-found: error
+`;
 }
 
-/* ══ UTILS ══ */
-function slug(s){return(s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40);}
+// ===== GENERATE CAP CONFIG =====
+function generateCapConfig(appName, appPkg, splashDuration, splashBg, splashAccent) {
+  return JSON.stringify({
+    appId: appPkg,
+    appName: appName,
+    webDir: "www",
+    server: {
+      androidScheme: "https"
+    },
+    plugins: {
+      SplashScreen: {
+        launchShowDuration: parseInt(splashDuration),
+        launchAutoHide: true,
+        backgroundColor: splashBg,
+        androidScaleType: "CENTER_CROP",
+        showSpinner: true,
+        androidSpinnerStyle: "large",
+        spinnerColor: splashAccent,
+        splashFullScreen: true,
+        splashImmersive: true
+      }
+    }
+  }, null, 2);
+}
+
+// ===== DEFAULT HTML =====
+function getDefaultHTML(appName, font, bg, accent) {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>${appName}</title>
+<link href="https://fonts.googleapis.com/css2?family=${font.replace(/ /g,'+')}:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; font-family:'${font}',sans-serif; }
+body { background:${bg}; color:#fff; min-height:100vh; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:16px; padding:20px; text-align:center; }
+h1 { font-size:28px; font-weight:700; color:${accent}; }
+p { font-size:15px; opacity:0.7; max-width:300px; line-height:1.6; }
+.btn { margin-top:8px; padding:12px 28px; background:${accent}; color:#000; border:none; border-radius:99px; font-size:15px; font-weight:600; cursor:pointer; }
+</style>
+</head>
+<body>
+<h1>✨ ${appName}</h1>
+<p>App ini dibuat dengan APK Builder. Edit file ini sesuai kebutuhan.</p>
+<button class="btn" onclick="alert('Hello dari ${appName}!')">Get Started</button>
+</body>
+</html>`;
+}
+
+function getUrlHTML(url) {
+  return `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>* { margin:0;padding:0; } iframe { width:100vw;height:100vh;border:none; }</style>
+</head>
+<body>
+<iframe src="${url}" allowfullscreen></iframe>
+</body>
+</html>`;
+}
+
+function resetBuild() {
+  state.buildPhase = 0;
+  state.runId = null;
+}
+
+// ===== INIT =====
+document.addEventListener('DOMContentLoaded', () => {
+  // Auto-set splashBg from theme
+  updateSplashPreview();
+});
 </script>
 </body>
 </html>
